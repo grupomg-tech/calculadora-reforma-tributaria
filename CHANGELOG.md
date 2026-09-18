@@ -11,6 +11,12 @@ All notable changes to this project are documented here. The format follows
   demo banner pointing to the source and the API contract.
 - README sections "Who is it for", "What it does not do" and "Alternatives"
   (survey of related open-source and free tools, September 2026).
+- Runtime validation of the API payload (`validateReport`): wrong types are
+  rejected with the offending path instead of rendering `NaN`; optional
+  `schema_version` with a supported-major check. Demo and fixture now carry
+  `schema_version: "1.0"`.
+- Numeric regression tests for the demo model (headline figures, totals and two
+  hand-computed products) and a rounding check.
 
 ### Changed
 

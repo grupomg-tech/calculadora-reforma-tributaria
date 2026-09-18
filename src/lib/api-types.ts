@@ -81,7 +81,15 @@ export interface Graficos {
   comparativo_saidas?: ChartJsData;
 }
 
+/** Major version of the contract this front end understands. */
+export const SUPPORTED_SCHEMA_MAJOR = 1;
+
 export interface DadosRelatorio {
+  /**
+   * Optional contract version ("1.0"). A payload with a higher major version
+   * is rejected with a clear error; a missing version is treated as 1.x.
+   */
+  schema_version?: string;
   resumo?: {
     apuracao_atual?: ResumoApuracao;
     apuracao_reforma?: ResumoApuracao;

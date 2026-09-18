@@ -21,6 +21,22 @@ npm run test:coverage   # coverage report + thresholds (same as CI)
 | `src/components/dashboard/TopProducts.test.tsx` | Empty state, top-10 ordering, impact badges, detail dialog, purchases tab |
 | `src/App.test.tsx` | Root route, 404 route, error boundary |
 
+## Numeric regression
+
+`src/lib/demo.test.ts` freezes the headline figures, the purchase/sale totals
+and two products computed by hand (a zero-rated purchase and a sale subject to
+IS). They are not a legal reference; they protect the illustrative model from
+silent changes. If you change the model or the catalogue on purpose, update the
+expected values in the same PR and add a CHANGELOG entry saying the demo
+numbers changed.
+
+## Contract validation
+
+`src/lib/report.test.ts` covers `validateReport`: partial payloads are accepted,
+wrong types are rejected with the path in the message, and an unsupported
+`schema_version` major is refused. Add a case there whenever the contract gains
+a block.
+
 ## Fixture
 
 `src/test/fixtures/relatorio.json` is a full report in the API contract shape

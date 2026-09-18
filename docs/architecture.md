@@ -47,9 +47,13 @@ FilterPanel ──(empresa, período, alíquotas)──▶ Index.fetchData
 
 1. **Everything that computes lives in `src/lib`** and is a pure function with a
    unit test. Components only map data to JSX.
-2. **The contract is permissive on purpose.** Backends evolve; a missing block
-   must degrade to "section not shown", never to a crash. `report.ts` prefers
-   the `graficos` block and falls back to product-level sums.
+2. **The contract is permissive on purpose, but not shapeless.** Backends
+   evolve; a missing block degrades to "section not shown", never to a crash.
+   A block that *is* present must have the documented shape:
+   `validateReport` rejects wrong types with the offending path, and a
+   `schema_version` with a major above `SUPPORTED_SCHEMA_MAJOR` is refused.
+   `report.ts` prefers the `graficos` block and falls back to product-level
+   sums.
 3. **Defaults reproduce the original deployment.** `VITE_BASE`,
    `VITE_ROUTER_BASENAME` and `VITE_API_URL` default to the paths used when the
    app is served under a sub-path of the backend, so upgrading never changes a

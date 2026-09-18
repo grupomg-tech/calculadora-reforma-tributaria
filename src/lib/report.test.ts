@@ -18,7 +18,46 @@ describe("parseApiResponse", () => {
   });
 
   it("rejects invalid JSON", () => {
-    expect(() => parseApiResponse("not json")).toThrow();
+    expect(() => parseApiResponse("not json")).toThrow(/JSON válido/);
+  });
+});
+
+describe("validateReport (through parseApiResponse)", () => {
+  const ok = (payload: unknown) => parseApiResponse(JSON.stringify(payload));
+
+  it("accepts a partial report and the documented fixture shape", () => {
+    expect(ok({})).toEqual({});
+    expect(ok({ saidas: { venda_bruta: 10 } })).toEqual({ saidas: { venda_bruta: 10 } });
+    expect(ok({ schema_version: "1.0", entradas: { produtos: [] }, graficos: { comparativo_entradas: { labels: [], datasets: [{ data: [] }] } } }))
+      .toMatchObject({ schema_version: "1.0" });
+  });
+
+  it("rejects a root that is not an object", () => {
+    expect(() => ok([])).toThrow(/"\$" deveria ser um objeto/);
+    expect(() => ok("texto")).toThrow(/"\$" deveria ser um objeto/);
+  });
+
+  it("rejects a summary block with non-numeric figures, naming the path", () => {
+    expect(() => ok({ resumo: { apuracao_atual: { debitos: "100", creditos: 1, resultado: 1, carga_tributaria_efetiva: 1 } } }))
+      .toThrow(/"resumo\.apuracao_atual\.debitos" deveria ser um número/);
+    expect(() => ok({ resumo: { apuracao_reforma: { debitos: 1, creditos: 1, resultado: 1 } } }))
+      .toThrow(/carga_tributaria_efetiva/);
+  });
+
+  it("rejects products that are not a list of objects", () => {
+    expect(() => ok({ entradas: { produtos: "nenhum" } })).toThrow(/"entradas\.produtos" deveria ser uma lista/);
+    expect(() => ok({ saidas: { produtos: [1] } })).toThrow(/"saidas\.produtos\[0\]" deveria ser um objeto/);
+  });
+
+  it("rejects malformed chart blocks", () => {
+    expect(() => ok({ graficos: { tributos_entradas: { datasets: {} } } })).toThrow(/"graficos\.tributos_entradas\.datasets" deveria ser uma lista/);
+    expect(() => ok({ graficos: { comparativo_saidas: { datasets: [{ data: "x" }] } } })).toThrow(/datasets\[0\]\.data/);
+  });
+
+  it("rejects an unsupported contract major version and accepts 1.x", () => {
+    expect(() => ok({ schema_version: "2.0" })).toThrow(/Versão do contrato não suportada: 2\.0/);
+    expect(() => ok({ schema_version: 1 })).toThrow(/"schema_version" deveria ser uma string/);
+    expect(ok({ schema_version: "1.4" })).toEqual({ schema_version: "1.4" });
   });
 });
 

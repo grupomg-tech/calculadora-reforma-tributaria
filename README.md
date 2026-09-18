@@ -108,8 +108,11 @@ GET <VITE_API_URL>
 
 Expected response (JSON, optionally wrapped in a `dados` key). The full contract is in [`src/lib/api-types.ts`](src/lib/api-types.ts); every block is optional and the UI hides what is missing.
 
+**Validation.** The payload is checked when it arrives (`validateReport` in [`src/lib/report.ts`](src/lib/report.ts)): a block that is present must have the documented shape (summary figures are numbers, `produtos` is a list of objects, chart blocks have `labels`/`datasets` lists). A violation is shown as *"Resposta da API inválida: \<path\> deveria ser \<tipo\>"* instead of rendering `NaN`. `schema_version` is optional; a missing value means `1.x`, and a higher major version is rejected with a clear message.
+
 ```jsonc
 {
+  "schema_version": "1.0",
   "resumo": {
     "apuracao_atual":   { "debitos": 0, "creditos": 0, "resultado": 0, "carga_tributaria_efetiva": 0 },
     "apuracao_reforma": { "debitos": 0, "creditos": 0, "resultado": 0, "carga_tributaria_efetiva": 0 }

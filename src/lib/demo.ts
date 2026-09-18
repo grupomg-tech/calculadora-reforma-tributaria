@@ -119,6 +119,7 @@ export const buildDemoReport = (aliquotas: Aliquotas): DadosRelatorio => {
   const resultadoReforma = round(debitosReforma - creditosReforma);
 
   return {
+    schema_version: "1.0",
     resumo: {
       apuracao_atual: {
         debitos,
