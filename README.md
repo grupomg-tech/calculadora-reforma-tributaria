@@ -35,6 +35,7 @@ Constitutional Amendment 132/2023 replaces PIS, COFINS, ICMS, ISS and part of IP
 - **Top products** — the 10 most purchased and most sold products, with per-product value comparison and tax breakdown.
 - **Filters** — company, start and end period; filters can be preset through the URL query string.
 - **Demo mode** — a fictional catalogue of 12 products (basic-basket items at zero rate, reduced-rate goods, products subject to IS) lets you explore the dashboard without a backend.
+- **CSV export** — one row per product (purchases and sales) with every tax field, formatted for Brazilian spreadsheets (`;` separator, `,` decimals, UTF-8 BOM).
 - **Auto refresh** — optional 30-second polling.
 
 ## What it does not do
@@ -155,6 +156,7 @@ src/
 │   ├── api-types.ts                 # API contract
 │   ├── report.ts                    # pure data-mapping functions (+ tests)
 │   ├── demo.ts                      # fictional dataset for demo mode (+ tests)
+│   ├── export.ts                    # CSV export (+ tests)
 │   └── config.ts                    # env-based configuration
 ├── pages/Index.tsx                  # data fetching and page layout
 └── components/dashboard/
@@ -172,7 +174,8 @@ src/
 - [x] Typed API contract and unit tests for the data mapping
 - [x] Component tests, coverage thresholds, Dependabot, CodeQL and audit workflow
 - [ ] Classification of products (NCM) into the reform's differentiated regimes, with legal references
-- [ ] Export the simulation (CSV / PDF)
+- [x] Export the simulation to CSV
+- [ ] Export the simulation to PDF
 - [ ] English UI (i18n)
 
 ## Documentation

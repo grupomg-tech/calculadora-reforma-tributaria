@@ -102,6 +102,38 @@ describe("<Index />", () => {
     });
   });
 
+  it("exports the loaded report as CSV and stays disabled without data", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse("nf", 404)));
+    const createObjectURL = vi.fn((_blob: Blob) => "blob:report");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("URL", Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }));
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+    render(<Index />);
+
+    await waitFor(() => expect(screen.getByText(/Erro HTTP 404/)).toBeInTheDocument());
+    const button = screen.getByRole("button", { name: /Exportar CSV/ });
+    expect(button).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: /dados de exemplo/ }));
+    await waitFor(() => expect(button).toBeEnabled());
+    fireEvent.click(button);
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    const blob = createObjectURL.mock.calls[0][0];
+    expect(blob.type).toBe("text/csv;charset=utf-8");
+    // jsdom's Blob has no text(); read it the browser way.
+    const text = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(blob);
+    });
+    expect(text).toContain("tipo;descricao;ncm");
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:report");
+    click.mockRestore();
+  });
+
   it("links to the repository from the header and from the demo banner", async () => {
     vi.stubGlobal("fetch", vi.fn());
     setSearch("?demo=1");

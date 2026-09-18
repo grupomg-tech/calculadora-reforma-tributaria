@@ -17,6 +17,8 @@ All notable changes to this project are documented here. The format follows
   `schema_version: "1.0"`.
 - Numeric regression tests for the demo model (headline figures, totals and two
   hand-computed products) and a rounding check.
+- "Exportar CSV" button: one row per product with every tax field, `;`
+  separator, `,` decimals and UTF-8 BOM for Brazilian spreadsheets (#17).
 
 ### Changed
 

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, ExternalLink, FlaskConical } from "lucide-react";
+import { AlertTriangle, Download, ExternalLink, FlaskConical } from "lucide-react";
 import FilterPanel from "@/components/dashboard/FilterPanel";
 import { ImpactCards, SummaryCards, ImpactBadge } from "@/components/dashboard/ImpactOverview";
 import TopProducts from "@/components/dashboard/TopProducts";
@@ -11,6 +11,7 @@ import TaxCharts from "@/components/dashboard/TaxCharts";
 import type { DadosRelatorio } from "@/lib/api-types";
 import { API_URL, REPO_URL, isDemoMode } from "@/lib/config";
 import { buildDemoReport } from "@/lib/demo";
+import { csvFileName, downloadCsv } from "@/lib/export";
 import {
   computeImpactDelta, deriveBurdenBar, deriveComparativo, derivePieData, parseApiResponse,
 } from "@/lib/report";
@@ -114,6 +115,16 @@ const Index = () => {
                 <ImpactBadge label="Impacto Resultado" value={impactoDelta.resultado} prefix="R$" />
               </div>
             )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!data}
+              onClick={() => data && downloadCsv(data, csvFileName({ empresa, periodoInicial, periodoFinal }))}
+              title="Baixa uma linha por produto (entradas e saídas) em CSV para planilha"
+            >
+              <Download className="h-4 w-4 mr-1" /> Exportar CSV
+            </Button>
             <a
               href={REPO_URL}
               target="_blank"
