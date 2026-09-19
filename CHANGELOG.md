@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- NCM → reform-regime lookup (`src/lib/regimes.ts`): zero rate (Anexos I / XV),
+  60% reduction (Anexos VII / VIII), Imposto Seletivo (Anexo XVII) and the
+  standard-rate fallback (art. 16). Demo products use `regimeForNcm` instead of
+  a hard-coded `fator`. Product cards and the detail dialog show a regime
+  badge with the legal citation (#16).
 - CSV export of the loaded report: header button "Exportar CSV" (enabled when
   a report is present) downloads one row per purchase and sale product, with
   the `Produto` columns plus `tipo`, `;` as separator, `,` as decimal mark and
@@ -27,6 +32,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Demo sugar (NCM 1701.99.00) is now zero-rated per LC 214/2025 art. 125,
+  Anexo I; the catalogue previously hard-coded a 60% reduction. Headline
+  demo figures in the numeric regression tests were updated to match.
 - **Project renamed** from `dashreforma` to `calculadora-reforma-tributaria`
   ("Calculadora Reforma Tributária"): repository URL, demo URL
   (`grupomg-tech.github.io/calculadora-reforma-tributaria/`), package name,

@@ -156,6 +156,7 @@ src/
 │   ├── api-types.ts                 # API contract
 │   ├── report.ts                    # pure data-mapping functions (+ tests)
 │   ├── export.ts                    # CSV serialisation of the report (+ tests)
+│   ├── regimes.ts                   # NCM → reform regime lookup (+ tests)
 │   ├── demo.ts                      # fictional dataset for demo mode (+ tests)
 │   └── config.ts                    # env-based configuration
 ├── pages/Index.tsx                  # data fetching and page layout
@@ -173,7 +174,7 @@ src/
 - [x] Demo mode so the dashboard runs without a backend
 - [x] Typed API contract and unit tests for the data mapping
 - [x] Component tests, coverage thresholds, Dependabot, CodeQL and audit workflow
-- [ ] Classification of products (NCM) into the reform's differentiated regimes, with legal references
+- [x] Classification of products (NCM) into the reform's differentiated regimes, with legal references
 - [x] Export the simulation to CSV
 - [ ] Export the simulation to PDF
 - [ ] English UI (i18n)

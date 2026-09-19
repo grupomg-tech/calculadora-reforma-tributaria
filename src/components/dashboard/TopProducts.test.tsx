@@ -81,6 +81,24 @@ describe("<TopProducts />", () => {
     expect(screen.getByTitle("Refrigerante cola garrafa retornável 2 litros")).toHaveTextContent("Refrigerante cola garrafa retornável 2 litros");
   });
 
+  it("shows the reform regime on the product card and in the detail dialog", () => {
+    render(<TopProducts produtosEntrada={[]} produtosSaida={[produto(1, { ncm: "1006.30.21" })]} />);
+
+    const card = screen.getByTitle("Produto 01");
+    expect(within(card).getByText("Alíquota zero")).toBeInTheDocument();
+
+    fireEvent.click(card);
+
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("Alíquota zero")).toBeInTheDocument();
+    expect(within(dialog).getByText(/NCM 1006\.30\.21 · LC 214\/2025 art\. 125, Anexo I/)).toBeInTheDocument();
+  });
+
+  it("labels an unknown NCM as the standard rate", () => {
+    render(<TopProducts produtosEntrada={[]} produtosSaida={[produto(1, { ncm: "9999.99.99" })]} />);
+    expect(screen.getByText("Alíquota padrão")).toBeInTheDocument();
+  });
+
   it("uses the purchases tab for inbound products", () => {
     render(<TopProducts produtosEntrada={[produto(5)]} produtosSaida={[]} />);
 

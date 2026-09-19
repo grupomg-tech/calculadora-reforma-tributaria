@@ -16,10 +16,11 @@ npm run test:coverage   # coverage report + thresholds (same as CI)
 | --- | --- |
 | `src/lib/report.test.ts` | `parseApiResponse` (plain, `dados` wrapper, HTML, invalid JSON), `computeImpactDelta`, `deriveBurdenBar`, `derivePieData`, `deriveComparativo` |
 | `src/lib/export.test.ts` | `toCsv` (empty report, fixture rows, `;` quoting, UTF-8 BOM, pt-BR decimals) and the download helper |
-| `src/lib/demo.test.ts` | Internal consistency of the fictional model: per-product totals, aggregates, assessment = debits − credits, reaction to rates, selective tax on flagged products only, zero/reduced rates |
+| `src/lib/regimes.test.ts` | `regimeForNcm`: one NCM per regime (zero, 60% food, 60% hygiene, IS), unknown → standard, legal citation on every table row |
+| `src/lib/demo.test.ts` | Internal consistency of the fictional model: per-product totals, aggregates, assessment = debits − credits, reaction to rates, selective tax on flagged products only, NCM table drives fator |
 | `src/pages/Index.test.tsx` | Fetch on mount with the right query string, `dados` wrapper, HTTP error + fallback button, network error message, `?demo=1` without network, recalculation on rate change, CSV export (disabled until loaded; download in demo mode), filters from the query string |
 | `src/components/dashboard/FilterPanel.test.tsx` | Rendering, setters, submit, disabled while loading, auto-refresh toggle |
-| `src/components/dashboard/TopProducts.test.tsx` | Empty state, top-10 ordering, impact badges, detail dialog, purchases tab |
+| `src/components/dashboard/TopProducts.test.tsx` | Empty state, top-10 ordering, impact badges, detail dialog, regime badge, purchases tab |
 | `src/App.test.tsx` | Root route, 404 route, error boundary |
 
 ## Numeric regression

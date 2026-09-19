@@ -33,6 +33,7 @@ FilterPanel ──(empresa, período, alíquotas)──▶ Index.fetchData
 | `src/lib/api-types.ts` | TypeScript contract of the report endpoint. Every block is optional; the UI hides what is missing. | type check |
 | `src/lib/report.ts` | Pure functions that turn the report into chart rows and headline deltas. No React, no I/O. | `report.test.ts` |
 | `src/lib/export.ts` | `toCsv(report)` serialises purchases and sales as a pt-BR CSV (`;` / `,` / UTF-8 BOM). `downloadCsv` triggers the browser download. | `export.test.ts` |
+| `src/lib/regimes.ts` | Focused NCM → IBS/CBS/IS regime table (`regimeForNcm`) with LC 214/2025 citations. | `regimes.test.ts` |
 | `src/lib/demo.ts` | Fictional catalogue and a simplified tax model that produce a complete `DadosRelatorio` for any set of rates. | `demo.test.ts` |
 | `src/lib/config.ts` | Runtime configuration from `VITE_*` variables and the `?demo` flag. | `Index.test.tsx` |
 | `src/pages/Index.tsx` | State (filters, data, loading, error, demo), fetching, auto refresh, page layout, CSV export button. | `Index.test.tsx` |
@@ -71,7 +72,9 @@ rarely, so browsers keep them cached between releases.
 ## Demo tax model (illustrative only)
 
 `lib/demo.ts` charges ICMS, PIS and COFINS "por dentro" (inside `valor_total`),
-then applies IBS, CBS and IS "por fora" on the value net of those taxes. Each
-fictional product carries a `fator` (1 = standard rate, 0.4 = 60% reduction,
-0 = zero rate) and a `seletivo` flag for the selective tax. The model exists so
-the UI can be explored; it is not a reference implementation of the law.
+then applies IBS, CBS and IS "por fora" on the value net of those taxes.
+`regimeForNcm` (in `lib/regimes.ts`) supplies `fator` (1 = standard rate,
+0.4 = 60% reduction, 0 = zero rate) and the Imposto Seletivo flag from a
+focused, cited table (LC 214/2025). Unknown NCMs receive the standard rate.
+The model exists so the UI can be explored; it is not a reference
+implementation of the law.

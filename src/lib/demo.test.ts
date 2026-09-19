@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildDemoReport } from "./demo";
+import { regimeForNcm } from "./regimes";
 
 const RATES = { ibs: 18.5, cbs: 8.5, is: 0 };
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -65,15 +66,15 @@ describe("buildDemoReport", () => {
   });
 
   // Numeric regression: these figures were computed by hand from the model described in
-  // docs/architecture.md and frozen here. Changing the model or the catalogue must update
-  // them on purpose, together with a CHANGELOG entry.
+  // docs/architecture.md and frozen here. Changing the model, the catalogue or the NCM
+  // table must update them on purpose, together with a CHANGELOG entry.
   describe("numeric regression (default rates 18.5 / 8.5 / 0)", () => {
     it("reproduces the headline assessment figures", () => {
       expect(report.resumo!.apuracao_atual).toEqual({
         debitos: 158861.01, creditos: 120349.26, resultado: 38511.75, carga_tributaria_efetiva: 4.39,
       });
       expect(report.resumo!.apuracao_reforma).toEqual({
-        debitos: 80165.82, creditos: 60731.68, resultado: 19434.14, carga_tributaria_efetiva: 2.43,
+        debitos: 75703.25, creditos: 57350.94, resultado: 18352.31, carga_tributaria_efetiva: 2.31,
       });
     });
 
@@ -82,11 +83,11 @@ describe("buildDemoReport", () => {
       const { produtos: _s, ...saidas } = report.saidas!;
       expect(entradas).toEqual({
         compra_bruta: 664610, creditos: 120349.26, compra_liquida: 544260.74, carga_tributaria_atual: 18.11,
-        creditos_ibs_cbs: 60731.68, compra_total_reforma: 604992.42, carga_tributaria_reforma: 10.04,
+        creditos_ibs_cbs: 57350.94, compra_total_reforma: 601611.68, carga_tributaria_reforma: 9.53,
       });
       expect(saidas).toEqual({
         venda_bruta: 877285.2, debitos: 158861.01, venda_liquida: 718424.19, carga_tributaria_atual: 18.11,
-        debitos_ibs_cbs: 80165.82, venda_total_reforma: 798590.01, carga_tributaria_reforma: 10.04,
+        debitos_ibs_cbs: 75703.25, venda_total_reforma: 794127.44, carga_tributaria_reforma: 9.53,
       });
     });
 
@@ -122,10 +123,27 @@ describe("buildDemoReport", () => {
     });
   });
 
-  it("applies reduced and zero rates to basic-basket products", () => {
+  it("applies reduced and zero rates from the NCM table", () => {
     const arroz = report.entradas!.produtos!.find((p) => String(p.descricao).startsWith("Arroz"))!;
+    const acucar = report.entradas!.produtos!.find((p) => String(p.descricao).startsWith("Açúcar"))!;
+    const oleo = report.entradas!.produtos!.find((p) => String(p.descricao).startsWith("Óleo"))!;
     const sabao = report.entradas!.produtos!.find((p) => String(p.descricao).startsWith("Sabão"))!;
+    expect(regimeForNcm(String(arroz.ncm)).fator).toBe(0);
+    expect(regimeForNcm(String(acucar.ncm)).fator).toBe(0);
+    expect(regimeForNcm(String(oleo.ncm)).fator).toBe(0.4);
+    expect(regimeForNcm(String(sabao.ncm)).fator).toBe(1);
     expect(arroz.ibs_cbs).toBe(0);
-    expect(sabao.ibs_cbs).toBeGreaterThan(0);
+    expect(acucar.ibs_cbs).toBe(0);
+    expect(oleo.ibs_cbs).toBeGreaterThan(0);
+    expect(sabao.ibs_cbs).toBeGreaterThan(oleo.ibs_cbs!);
+  });
+
+  it("applies each product's IBS/CBS from regimeForNcm, not a hard-coded fator", () => {
+    for (const p of report.entradas!.produtos!) {
+      const regime = regimeForNcm(String(p.ncm));
+      const base = p.valor_total! - p.icms! - p.pis! - p.cofins!;
+      expect(p.ibs).toBeCloseTo(round2((base * RATES.ibs * regime.fator) / 100), 2);
+      expect(p.cbs).toBeCloseTo(round2((base * RATES.cbs * regime.fator) / 100), 2);
+    }
   });
 });

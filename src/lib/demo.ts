@@ -1,4 +1,5 @@
 import type { Aliquotas, DadosRelatorio, Produto } from "./api-types";
+import { regimeForNcm } from "./regimes";
 
 /**
  * Demo mode: builds a complete report from a small fictional catalogue, so the
@@ -10,9 +11,8 @@ import type { Aliquotas, DadosRelatorio, Produto } from "./api-types";
  *    are part of `valor_total`;
  *  - reform: IBS, CBS and IS are charged "por fora", on the value net of the
  *    current taxes;
- *  - `fator` scales the IBS/CBS rates (1 = standard rate, 0.4 = 60% reduction,
- *    0 = zero rate, as in the national basic food basket);
- *  - IS (selective tax) only applies to products flagged with `seletivo`.
+ *  - `regimeForNcm` supplies `fator` (1 = standard, 0.4 = 60% reduction,
+ *    0 = zero rate) and the Imposto Seletivo flag from LC 214/2025.
  */
 
 interface DemoItem {
@@ -24,26 +24,24 @@ interface DemoItem {
   icms: number;
   pis: number;
   cofins: number;
-  fator: number;
-  seletivo?: boolean;
 }
 
 const PIS = 1.65;
 const COFINS = 7.6;
 
 const COMPRAS: DemoItem[] = [
-  { descricao: "Arroz branco tipo 1 5kg", ncm: "1006.30.21", quantidade: 4200, valor_total: 96600, icms: 7, pis: 0, cofins: 0, fator: 0 },
-  { descricao: "Feijão carioca 1kg", ncm: "0713.33.19", quantidade: 6100, valor_total: 45750, icms: 7, pis: 0, cofins: 0, fator: 0 },
-  { descricao: "Óleo de soja 900ml", ncm: "1507.90.11", quantidade: 7400, valor_total: 51800, icms: 12, pis: PIS, cofins: COFINS, fator: 0.4 },
-  { descricao: "Açúcar cristal 2kg", ncm: "1701.99.00", quantidade: 5300, valor_total: 39750, icms: 12, pis: PIS, cofins: COFINS, fator: 0.4 },
-  { descricao: "Café torrado e moído 500g", ncm: "0901.21.00", quantidade: 3900, valor_total: 70200, icms: 12, pis: 0, cofins: 0, fator: 0 },
-  { descricao: "Refrigerante cola 2L", ncm: "2202.10.00", quantidade: 9800, valor_total: 68600, icms: 17, pis: PIS, cofins: COFINS, fator: 1, seletivo: true },
-  { descricao: "Cerveja pilsen lata 350ml", ncm: "2203.00.00", quantidade: 24000, valor_total: 79200, icms: 17, pis: PIS, cofins: COFINS, fator: 1, seletivo: true },
-  { descricao: "Sabão em pó 1,6kg", ncm: "3402.50.00", quantidade: 2600, valor_total: 49400, icms: 17, pis: PIS, cofins: COFINS, fator: 1 },
-  { descricao: "Papel higiênico 12 rolos", ncm: "4818.10.00", quantidade: 3100, valor_total: 52700, icms: 17, pis: PIS, cofins: COFINS, fator: 0.4 },
-  { descricao: "Biscoito recheado 140g", ncm: "1905.31.00", quantidade: 11500, valor_total: 28750, icms: 17, pis: PIS, cofins: COFINS, fator: 1 },
-  { descricao: "Leite UHT integral 1L", ncm: "0401.20.10", quantidade: 15000, valor_total: 63000, icms: 7, pis: 0, cofins: 0, fator: 0 },
-  { descricao: "Detergente líquido 500ml", ncm: "3402.50.00", quantidade: 8200, valor_total: 18860, icms: 17, pis: PIS, cofins: COFINS, fator: 1 },
+  { descricao: "Arroz branco tipo 1 5kg", ncm: "1006.30.21", quantidade: 4200, valor_total: 96600, icms: 7, pis: 0, cofins: 0 },
+  { descricao: "Feijão carioca 1kg", ncm: "0713.33.19", quantidade: 6100, valor_total: 45750, icms: 7, pis: 0, cofins: 0 },
+  { descricao: "Óleo de soja 900ml", ncm: "1507.90.11", quantidade: 7400, valor_total: 51800, icms: 12, pis: PIS, cofins: COFINS },
+  { descricao: "Açúcar cristal 2kg", ncm: "1701.99.00", quantidade: 5300, valor_total: 39750, icms: 12, pis: PIS, cofins: COFINS },
+  { descricao: "Café torrado e moído 500g", ncm: "0901.21.00", quantidade: 3900, valor_total: 70200, icms: 12, pis: 0, cofins: 0 },
+  { descricao: "Refrigerante cola 2L", ncm: "2202.10.00", quantidade: 9800, valor_total: 68600, icms: 17, pis: PIS, cofins: COFINS },
+  { descricao: "Cerveja pilsen lata 350ml", ncm: "2203.00.00", quantidade: 24000, valor_total: 79200, icms: 17, pis: PIS, cofins: COFINS },
+  { descricao: "Sabão em pó 1,6kg", ncm: "3402.50.00", quantidade: 2600, valor_total: 49400, icms: 17, pis: PIS, cofins: COFINS },
+  { descricao: "Papel higiênico 12 rolos", ncm: "4818.10.00", quantidade: 3100, valor_total: 52700, icms: 17, pis: PIS, cofins: COFINS },
+  { descricao: "Biscoito recheado 140g", ncm: "1905.31.00", quantidade: 11500, valor_total: 28750, icms: 17, pis: PIS, cofins: COFINS },
+  { descricao: "Leite UHT integral 1L", ncm: "0401.20.10", quantidade: 15000, valor_total: 63000, icms: 7, pis: 0, cofins: 0 },
+  { descricao: "Detergente líquido 500ml", ncm: "3402.50.00", quantidade: 8200, valor_total: 18860, icms: 17, pis: PIS, cofins: COFINS },
 ];
 
 /** Markup applied to each purchase to obtain the matching sale. */
@@ -60,10 +58,11 @@ const buildProduto = (item: DemoItem, aliquotas: Aliquotas, tipo: "entrada" | "s
   const pis = round((valorTotal * item.pis) / 100);
   const cofins = round((valorTotal * item.cofins) / 100);
   const base = valorTotal - icms - pis - cofins;
+  const regime = regimeForNcm(item.ncm);
 
-  const ibs = round((base * aliquotas.ibs * item.fator) / 100);
-  const cbs = round((base * aliquotas.cbs * item.fator) / 100);
-  const is = item.seletivo ? round((base * aliquotas.is) / 100) : 0;
+  const ibs = round((base * aliquotas.ibs * regime.fator) / 100);
+  const cbs = round((base * aliquotas.cbs * regime.fator) / 100);
+  const is = regime.seletivo ? round((base * aliquotas.is) / 100) : 0;
   const totalReforma = round(base + ibs + cbs + is);
 
   const produto: Produto = {

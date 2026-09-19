@@ -13,9 +13,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShoppingCart, Store, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Package, BarChart3, Activity } from "lucide-react";
 import { COLORS, formatCurrency, formatCurrencyShort, formatPercent, formatNumber, tooltipCurrency } from "./utils";
 import type { Produto } from "@/lib/api-types";
+import { regimeForNcm, regimeKind, type NcmRegime, type RegimeKind } from "@/lib/regimes";
 
 type Tipo = "compra" | "venda";
 const productName = (p: Produto) => p.descricao || p.nome || p.produto || "Produto";
+
+const REGIME_BADGE: Record<RegimeKind, { label: string; className: string }> = {
+  zero: { label: "Alíquota zero", className: "border-emerald-200 bg-emerald-50 text-emerald-700" },
+  reduced60: { label: "Redução 60%", className: "border-sky-200 bg-sky-50 text-sky-700" },
+  standard: { label: "Alíquota padrão", className: "border-slate-200 bg-slate-50 text-slate-600" },
+  selective: { label: "Imposto seletivo", className: "border-orange-200 bg-orange-50 text-orange-700" },
+};
+
+const RegimeBadge = ({ ncm, showBase = false }: { ncm?: string; showBase?: boolean }) => {
+  if (!ncm) return null;
+  const regime: NcmRegime = regimeForNcm(ncm);
+  const ui = REGIME_BADGE[regimeKind(regime)];
+  return (
+    <div className="flex flex-col gap-1">
+      <Badge variant="outline" className={`w-fit text-[10px] font-semibold ${ui.className}`}>
+        {ui.label}
+      </Badge>
+      {showBase ? (
+        <p className="text-[10px] text-muted-foreground leading-snug">
+          NCM {ncm} · {regime.base}
+        </p>
+      ) : null}
+    </div>
+  );
+};
 
 interface TopProductsProps {
   produtosEntrada: Produto[];
@@ -175,7 +201,10 @@ const ProductCard = ({ product, rank, onClick }: { product: Produto; rank: numbe
         <CardContent className="pt-10 pb-4 px-4">
           <div className="flex items-start gap-2 mb-3">
             <Package className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-            <p className="text-xs font-semibold leading-tight line-clamp-2" title={name}>{name}</p>
+            <div className="min-w-0 space-y-1.5" title={name}>
+              <p className="text-xs font-semibold leading-tight line-clamp-2">{name}</p>
+              <RegimeBadge ncm={product.ncm} />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -245,7 +274,7 @@ const ProductDetailDialog = ({ product, tipo, open, onClose }: { product: Produt
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-lg">
+          <DialogTitle className="flex items-start gap-3 text-lg">
             <div className={`p-2 rounded-lg ${tipo === "compra" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
               {tipo === "compra" ? <ShoppingCart className="h-5 w-5" /> : <Store className="h-5 w-5" />}
             </div>
@@ -254,6 +283,9 @@ const ProductDetailDialog = ({ product, tipo, open, onClose }: { product: Produt
               <div className="text-xs text-muted-foreground font-normal mt-0.5">
                 {tipo === "compra" ? "Produto Comprado" : "Produto Vendido"}
                 {product.quantidade != null && ` • Qtd: ${formatNumber(product.quantidade)}`}
+              </div>
+              <div className="mt-2 font-normal">
+                <RegimeBadge ncm={product.ncm} showBase />
               </div>
             </div>
           </DialogTitle>
