@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildDemoReport } from "./demo";
+import { buildDemoReport, buildReportFromItems } from "./demo";
 
 const RATES = { ibs: 18.5, cbs: 8.5, is: 0 };
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -120,6 +120,25 @@ describe("buildDemoReport", () => {
         }
       }
     });
+  });
+
+  it("builds a contract-shaped report from a caller-supplied catalogue", () => {
+    const custom = buildReportFromItems([{
+      descricao: "Item X",
+      ncm: "0000.00.00",
+      quantidade: 2,
+      valor_total: 1000,
+      icms: 10,
+      pis: 0,
+      cofins: 0,
+      fator: 1,
+    }], RATES);
+    expect(custom.schema_version).toBe("1.0");
+    expect(custom.entradas!.produtos).toHaveLength(1);
+    expect(custom.entradas!.produtos![0]).toMatchObject({
+      valor_total: 1000, icms: 100, pis: 0, cofins: 0, creditos: 100,
+    });
+    expect(custom.saidas!.produtos![0]!.valor_total).toBe(1320);
   });
 
   it("applies reduced and zero rates to basic-basket products", () => {

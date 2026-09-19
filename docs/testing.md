@@ -16,7 +16,8 @@ npm run test:coverage   # coverage report + thresholds (same as CI)
 | --- | --- |
 | `src/lib/report.test.ts` | `parseApiResponse` (plain, `dados` wrapper, HTML, invalid JSON), `computeImpactDelta`, `deriveBurdenBar`, `derivePieData`, `deriveComparativo` |
 | `src/lib/export.test.ts` | `toCsv` (empty report, fixture rows, `;` quoting, UTF-8 BOM, pt-BR decimals) and the download helper |
-| `src/lib/demo.test.ts` | Internal consistency of the fictional model: per-product totals, aggregates, assessment = debits − credits, reaction to rates, selective tax on flagged products only, zero/reduced rates |
+| `src/lib/demo.test.ts` | Internal consistency of the fictional model: per-product totals, aggregates, assessment = debits − credits, reaction to rates, selective tax on flagged products only, zero/reduced rates, `buildReportFromItems` |
+| `examples/backend-node/*.test.ts` | CSV parse (quoted fields, required columns), default rates, CSV report equals `buildDemoReport`, HTTP 200 + `schema_version` + CORS |
 | `src/pages/Index.test.tsx` | Fetch on mount with the right query string, `dados` wrapper, HTTP error + fallback button, network error message, `?demo=1` without network, recalculation on rate change, CSV export (disabled until loaded; download in demo mode), filters from the query string |
 | `src/components/dashboard/FilterPanel.test.tsx` | Rendering, setters, submit, disabled while loading, auto-refresh toggle |
 | `src/components/dashboard/TopProducts.test.tsx` | Empty state, top-10 ordering, impact badges, detail dialog, purchases tab |
@@ -43,6 +44,12 @@ a block.
 `src/test/fixtures/relatorio.json` is a full report in the API contract shape
 (three products per side). Use it in new tests instead of building payloads by
 hand, and update it when the contract changes.
+
+## Example backend
+
+`examples/backend-node/smoke.sh` starts the reference server and checks HTTP 200
+plus a non-empty `schema_version`. The Vitest suites above cover the same path
+without binding port 8787.
 
 ## Coverage
 

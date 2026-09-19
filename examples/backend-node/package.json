@@ -1,0 +1,13 @@
+{
+  "name": "calculadora-reforma-tributaria-example-backend",
+  "private": true,
+  "type": "module",
+  "description": "Reference Node backend that implements the dashboard report contract from a fictional product CSV.",
+  "scripts": {
+    "start": "npx --yes tsx server.ts",
+    "smoke": "bash smoke.sh"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

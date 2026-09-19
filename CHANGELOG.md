@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Example Node backend (`examples/backend-node/`) that serves
+  `GET /dashboards/api/graficos/dados-relatorio/` from a fictional product CSV,
+  using `buildReportFromItems` from `src/lib/demo.ts`. Documented how to point
+  the Vite app at it with `VITE_API_URL` (#22).
 - CSV export of the loaded report: header button "Exportar CSV" (enabled when
   a report is present) downloads one row per purchase and sale product, with
   the `Produto` columns plus `tipo`, `;` as separator, `,` as decimal mark and

@@ -18,7 +18,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "example:backend": "npx --yes tsx examples/backend-node/server.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

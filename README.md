@@ -65,16 +65,17 @@ npm ci
 npm run dev      # dev server on http://localhost:8080
 ```
 
-Then open <http://localhost:8080/dashboards/dashboard-cliente/?demo=1> for the demo dataset, or point the app at your backend (see below).
+Then open <http://localhost:8080/dashboards/dashboard-cliente/?demo=1> for the demo dataset, or point the app at a backend (see below). A runnable reference server lives in [`examples/backend-node/`](examples/backend-node/).
 
 Other scripts:
 
 ```sh
-npm run build    # production build
-npm run preview  # preview the production build
-npm run lint     # ESLint
+npm run build             # production build
+npm run preview           # preview the production build
+npm run lint              # ESLint
 npm run typecheck
-npm test         # Vitest (npm run test:coverage for the coverage report)
+npm test                  # Vitest (npm run test:coverage for the coverage report)
+npm run example:backend   # reference report API on http://127.0.0.1:8787
 ```
 
 ## Configuration
@@ -92,7 +93,7 @@ The defaults reproduce the original deployment, where the app is served under a 
 
 ## Backend API
 
-This repository contains the front end only. It expects a backend that serves:
+This repository is the front end. It expects a backend that serves:
 
 ```
 GET <VITE_API_URL>
@@ -137,7 +138,13 @@ Expected response (JSON, optionally wrapped in a `dados` key). The full contract
 }
 ```
 
-`buildDemoReport()` in [`src/lib/demo.ts`](src/lib/demo.ts) produces a complete example of this payload.
+`buildDemoReport()` in [`src/lib/demo.ts`](src/lib/demo.ts) produces a complete example of this payload. [`examples/backend-node/`](examples/backend-node/) is a small Node `http` server that builds the same JSON from a CSV (`products.csv`) via `buildReportFromItems`. Start it with `npm run example:backend`, then in `.env.local`:
+
+```sh
+VITE_API_URL=http://127.0.0.1:8787/dashboards/api/graficos/dados-relatorio/
+```
+
+Restart `npm run dev` and open the dashboard **without** `?demo=1`. The example enables CORS for the Vite origin. Details and a `smoke.sh` check are in that folder's README.
 
 ## Architecture
 
@@ -151,6 +158,7 @@ All computation lives in `src/lib` as pure, unit-tested functions; components on
 ## Project structure
 
 ```
+examples/backend-node/               # reference Node server for the contract
 src/
 ├── lib/
 │   ├── api-types.ts                 # API contract
@@ -175,6 +183,7 @@ src/
 - [x] Component tests, coverage thresholds, Dependabot, CodeQL and audit workflow
 - [ ] Classification of products (NCM) into the reform's differentiated regimes, with legal references
 - [x] Export the simulation to CSV
+- [x] Reference Node backend that implements the API contract from a CSV
 - [ ] Export the simulation to PDF
 - [ ] English UI (i18n)
 
@@ -230,4 +239,4 @@ O `calculadora-reforma-tributaria` é um painel (React + TypeScript) que compara
 
 **Demo online:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> (dados fictícios; altere as alíquotas e clique em *Simular*).
 
-Este repositório contém apenas o front end; os dados vêm de uma API própria (veja [Backend API](#backend-api)). Para rodar sem backend, abra a aplicação com `?demo=1`. Projeto em estágio inicial — contribuições são bem-vindas. Ferramenta de simulação: não substitui orientação tributária profissional.
+Este repositório contém o front end; os dados vêm de uma API própria (veja [Backend API](#backend-api)). Há um exemplo de backend Node em [`examples/backend-node/`](examples/backend-node/). Para rodar sem backend, abra a aplicação com `?demo=1`. Projeto em estágio inicial — contribuições são bem-vindas. Ferramenta de simulação: não substitui orientação tributária profissional.

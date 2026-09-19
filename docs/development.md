@@ -31,6 +31,27 @@ The endpoint must return the JSON described in the
 complete, valid example you can serve from any static server to check the
 integration.
 
+### Example backend
+
+[`examples/backend-node/`](../examples/backend-node/) implements the contract
+from a fictional product CSV, using the same simplified model as
+`src/lib/demo.ts`. From the repository root:
+
+```sh
+npm run example:backend
+```
+
+Then set in `.env.local`:
+
+```sh
+VITE_API_URL=http://127.0.0.1:8787/dashboards/api/graficos/dados-relatorio/
+```
+
+Use an absolute URL: a relative `VITE_API_URL` is fetched from the Vite origin
+(`localhost:8080`) and would not reach the example process. Leave `?demo=1` off
+so the dashboard actually calls the API. The server sends CORS headers for local
+Vite. `bash examples/backend-node/smoke.sh` checks HTTP 200 and `schema_version`.
+
 ## Scripts
 
 | Script | What it does |
@@ -43,6 +64,7 @@ integration.
 | `npm test` | Vitest, single run |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run test:coverage` | Vitest with v8 coverage and thresholds |
+| `npm run example:backend` | Reference report API (`examples/backend-node/`) on port 8787 |
 
 ## Conventions
 

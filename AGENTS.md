@@ -34,6 +34,7 @@ the same commands.
 - `src/components/ui/` — generated shadcn/ui primitives. Do not edit; do not add
   primitives that are not imported.
 - `src/test/fixtures/relatorio.json` — canonical example of the API payload.
+- `examples/backend-node/` — reference Node server for the report contract.
 - `docs/` — architecture, development, testing, release and maintenance guides.
 
 ## Conventions

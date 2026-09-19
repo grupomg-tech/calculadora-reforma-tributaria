@@ -1,0 +1,14 @@
+# Fictional catalogue — same products as src/lib/demo.ts. Not tax advice.
+descricao,ncm,quantidade,valor_total,icms,pis,cofins,fator,seletivo
+Arroz branco tipo 1 5kg,1006.30.21,4200,96600,7,0,0,0,false
+Feijão carioca 1kg,0713.33.19,6100,45750,7,0,0,0,false
+Óleo de soja 900ml,1507.90.11,7400,51800,12,1.65,7.6,0.4,false
+Açúcar cristal 2kg,1701.99.00,5300,39750,12,1.65,7.6,0.4,false
+Café torrado e moído 500g,0901.21.00,3900,70200,12,0,0,0,false
+Refrigerante cola 2L,2202.10.00,9800,68600,17,1.65,7.6,1,true
+Cerveja pilsen lata 350ml,2203.00.00,24000,79200,17,1.65,7.6,1,true
+"Sabão em pó 1,6kg",3402.50.00,2600,49400,17,1.65,7.6,1,false
+Papel higiênico 12 rolos,4818.10.00,3100,52700,17,1.65,7.6,0.4,false
+Biscoito recheado 140g,1905.31.00,11500,28750,17,1.65,7.6,1,false
+Leite UHT integral 1L,0401.20.10,15000,63000,7,0,0,0,false
+Detergente líquido 500ml,3402.50.00,8200,18860,17,1.65,7.6,1,false

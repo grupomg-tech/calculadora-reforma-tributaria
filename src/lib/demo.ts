@@ -15,7 +15,8 @@ import type { Aliquotas, DadosRelatorio, Produto } from "./api-types";
  *  - IS (selective tax) only applies to products flagged with `seletivo`.
  */
 
-interface DemoItem {
+/** One row of the fictional catalogue (purchases). Sales apply a markup. */
+export interface CatalogueItem {
   descricao: string;
   ncm: string;
   quantidade: number;
@@ -31,7 +32,7 @@ interface DemoItem {
 const PIS = 1.65;
 const COFINS = 7.6;
 
-const COMPRAS: DemoItem[] = [
+const COMPRAS: CatalogueItem[] = [
   { descricao: "Arroz branco tipo 1 5kg", ncm: "1006.30.21", quantidade: 4200, valor_total: 96600, icms: 7, pis: 0, cofins: 0, fator: 0 },
   { descricao: "Feijão carioca 1kg", ncm: "0713.33.19", quantidade: 6100, valor_total: 45750, icms: 7, pis: 0, cofins: 0, fator: 0 },
   { descricao: "Óleo de soja 900ml", ncm: "1507.90.11", quantidade: 7400, valor_total: 51800, icms: 12, pis: PIS, cofins: COFINS, fator: 0.4 },
@@ -54,7 +55,7 @@ const sum = (items: Produto[], key: keyof Produto) =>
   round(items.reduce((total, item) => total + (Number(item[key]) || 0), 0));
 const percent = (part: number, whole: number) => (whole > 0 ? round((part / whole) * 100) : 0);
 
-const buildProduto = (item: DemoItem, aliquotas: Aliquotas, tipo: "entrada" | "saida"): Produto => {
+const buildProduto = (item: CatalogueItem, aliquotas: Aliquotas, tipo: "entrada" | "saida"): Produto => {
   const valorTotal = tipo === "saida" ? round(item.valor_total * MARKUP) : item.valor_total;
   const icms = round((valorTotal * item.icms) / 100);
   const pis = round((valorTotal * item.pis) / 100);
@@ -101,9 +102,14 @@ const comparativo = (produtos: Produto[]) => ({
   ],
 });
 
-export const buildDemoReport = (aliquotas: Aliquotas): DadosRelatorio => {
-  const compras = COMPRAS.map((item) => buildProduto(item, aliquotas, "entrada"));
-  const vendas = COMPRAS.map((item) => buildProduto(item, aliquotas, "saida"));
+/**
+ * Builds a complete `DadosRelatorio` from any catalogue using the simplified
+ * demo model. The Node example backend (`examples/backend-node/`) calls this
+ * with rows parsed from CSV so the figures stay identical to demo mode.
+ */
+export const buildReportFromItems = (items: CatalogueItem[], aliquotas: Aliquotas): DadosRelatorio => {
+  const compras = items.map((item) => buildProduto(item, aliquotas, "entrada"));
+  const vendas = items.map((item) => buildProduto(item, aliquotas, "saida"));
 
   const compraBruta = sum(compras, "valor_total");
   const creditos = sum(compras, "creditos");
@@ -160,3 +166,6 @@ export const buildDemoReport = (aliquotas: Aliquotas): DadosRelatorio => {
     },
   };
 };
+
+export const buildDemoReport = (aliquotas: Aliquotas): DadosRelatorio =>
+  buildReportFromItems(COMPRAS, aliquotas);
