@@ -17,10 +17,11 @@ npm run test:coverage   # coverage report + thresholds (same as CI)
 | `src/lib/report.test.ts` | `parseApiResponse` (plain, `dados` wrapper, HTML, invalid JSON), `computeImpactDelta`, `deriveBurdenBar`, `derivePieData`, `deriveComparativo` |
 | `src/lib/export.test.ts` | `toCsv` (empty report, fixture rows, `;` quoting, UTF-8 BOM, pt-BR decimals) and the download helper |
 | `src/lib/demo.test.ts` | Internal consistency of the fictional model: per-product totals, aggregates, assessment = debits − credits, reaction to rates, selective tax on flagged products only, zero/reduced rates |
-| `src/pages/Index.test.tsx` | Fetch on mount with the right query string, `dados` wrapper, HTTP error + fallback button, network error message, `?demo=1` without network, recalculation on rate change, CSV export (disabled until loaded; download in demo mode), filters from the query string |
+| `src/pages/Index.test.tsx` | Fetch on mount with the right query string, `dados` wrapper, HTTP error + fallback button, network error message, `?demo=1` without network, recalculation on rate change, CSV export (disabled until loaded; download in demo mode), filters from the query string, `?lang=en` English switch |
 | `src/components/dashboard/FilterPanel.test.tsx` | Rendering, setters, submit, disabled while loading, auto-refresh toggle |
 | `src/components/dashboard/TopProducts.test.tsx` | Empty state, top-10 ordering, impact badges, detail dialog, purchases tab |
 | `src/App.test.tsx` | Root route, 404 route, error boundary |
+| `src/i18n/index.test.ts` | Locale resolution (`?lang=` vs navigator vs default), catalog shape, interpolate, document lang/title |
 
 ## Numeric regression
 
@@ -57,6 +58,8 @@ uploaded as an artifact of the CI workflow.
   details.
 - Stub `fetch` with `vi.stubGlobal("fetch", …)` and clean up with
   `vi.unstubAllGlobals()`.
+- `src/test/setup.ts` pins `navigator.language` to `pt-BR` so the suite
+  uses the default catalog. Pass `?lang=en` to assert the English switch.
 - Stub `ResizeObserver` when rendering anything that includes Recharts.
 - Radix tabs activate on `mouseDown`, not `click`.
 - Prefer one assertion per behaviour; name tests by the behaviour they protect.

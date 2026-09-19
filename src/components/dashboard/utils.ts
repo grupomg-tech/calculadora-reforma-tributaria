@@ -11,6 +11,7 @@ export const COLORS = {
 
 export const PIE_COLORS = [COLORS.blue, COLORS.purple, COLORS.green, COLORS.orange, COLORS.cyan, COLORS.pink];
 
+// Number and currency stay pt-BR / BRL regardless of the UI language (issue #19).
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 

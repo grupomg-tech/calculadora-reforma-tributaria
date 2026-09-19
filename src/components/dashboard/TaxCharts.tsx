@@ -8,6 +8,7 @@ import {
 import { COLORS, PIE_COLORS, formatCurrency, formatCurrencyShort, formatPercent, tooltipCurrency } from "./utils";
 import type { Entradas, Saidas } from "@/lib/api-types";
 import type { BurdenBar, ComparativoRow, PieSlice } from "@/lib/report";
+import { useI18n } from "@/i18n";
 
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
@@ -33,20 +34,21 @@ const TaxCharts = ({
   barDataCompras, barDataVendas, pieDataEntradas, pieDataSaidas,
   comparativoEntradas, comparativoSaidas, entradas, saidas,
 }: TaxChartsProps) => {
+  const t = useI18n();
   return (
     <div className="space-y-6">
       {/* Carga Tributária Visual - Area Charts */}
       {(barDataCompras.length > 0 || barDataVendas.length > 0) && (
         <motion.div variants={item} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <GaugeCard
-            title="Carga Tributária — Compras"
-            description="Impacto percentual sobre o total de compras"
+            title={t.charts.burdenPurchases}
+            description={t.charts.burdenPurchasesHint}
             atualValue={barDataCompras[0]?.["Sistema Atual"] || 0}
             reformaValue={barDataCompras[0]?.Reforma || 0}
           />
           <GaugeCard
-            title="Carga Tributária — Vendas"
-            description="Impacto percentual sobre o total de vendas"
+            title={t.charts.burdenSales}
+            description={t.charts.burdenSalesHint}
             atualValue={barDataVendas[0]?.["Sistema Atual"] || 0}
             reformaValue={barDataVendas[0]?.Reforma || 0}
           />
@@ -57,7 +59,7 @@ const TaxCharts = ({
       {(comparativoEntradas.length > 0 || comparativoSaidas.length > 0) && (
         <motion.div variants={item} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {comparativoEntradas.length > 0 && (
-            <ChartCard title="Comparativo por Tributo — Entradas" description="Atual vs Reforma por tipo de tributo">
+            <ChartCard title={t.charts.compareInbound} description={t.charts.compareHint}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={comparativoEntradas} layout="vertical">
                   <defs>
@@ -75,14 +77,14 @@ const TaxCharts = ({
                   <YAxis dataKey="tributo" type="category" width={70} tick={{ fontSize: 11, fontWeight: 600 }} />
                   <Tooltip formatter={tooltipCurrency} contentStyle={CustomTooltipStyle} />
                   <Legend />
-                  <Bar dataKey="Atual" fill="url(#gradAtualEnt)" radius={[0, 6, 6, 0]} barSize={18} />
-                  <Bar dataKey="Reforma" fill="url(#gradReformaEnt)" radius={[0, 6, 6, 0]} barSize={18} />
+                  <Bar dataKey="Atual" name={t.charts.current} fill="url(#gradAtualEnt)" radius={[0, 6, 6, 0]} barSize={18} />
+                  <Bar dataKey="Reforma" name={t.charts.reform} fill="url(#gradReformaEnt)" radius={[0, 6, 6, 0]} barSize={18} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
           )}
           {comparativoSaidas.length > 0 && (
-            <ChartCard title="Comparativo por Tributo — Saídas" description="Atual vs Reforma por tipo de tributo">
+            <ChartCard title={t.charts.compareOutbound} description={t.charts.compareHint}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={comparativoSaidas} layout="vertical">
                   <defs>
@@ -100,8 +102,8 @@ const TaxCharts = ({
                   <YAxis dataKey="tributo" type="category" width={70} tick={{ fontSize: 11, fontWeight: 600 }} />
                   <Tooltip formatter={tooltipCurrency} contentStyle={CustomTooltipStyle} />
                   <Legend />
-                  <Bar dataKey="Atual" fill="url(#gradAtualSai)" radius={[0, 6, 6, 0]} barSize={18} />
-                  <Bar dataKey="Reforma" fill="url(#gradReformaSai)" radius={[0, 6, 6, 0]} barSize={18} />
+                  <Bar dataKey="Atual" name={t.charts.current} fill="url(#gradAtualSai)" radius={[0, 6, 6, 0]} barSize={18} />
+                  <Bar dataKey="Reforma" name={t.charts.reform} fill="url(#gradReformaSai)" radius={[0, 6, 6, 0]} barSize={18} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -112,16 +114,16 @@ const TaxCharts = ({
       {/* Distribuição de Tributos (Donut Charts) */}
       {(pieDataEntradas.length > 0 || pieDataSaidas.length > 0) && (
         <motion.div variants={item} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {pieDataEntradas.length > 0 && <DonutCard title="Composição Tributária — Entradas" data={pieDataEntradas} />}
-          {pieDataSaidas.length > 0 && <DonutCard title="Composição Tributária — Saídas" data={pieDataSaidas} />}
+          {pieDataEntradas.length > 0 && <DonutCard title={t.charts.compositionInbound} data={pieDataEntradas} />}
+          {pieDataSaidas.length > 0 && <DonutCard title={t.charts.compositionOutbound} data={pieDataSaidas} />}
         </motion.div>
       )}
 
       {/* Resumo Entradas vs Saídas */}
       {(entradas || saidas) && (
         <motion.div variants={item} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {entradas && <SummaryDetailCard title="Resumo Entradas (Compras)" color={COLORS.green} data={entradas} tipo="entrada" />}
-          {saidas && <SummaryDetailCard title="Resumo Saídas (Vendas)" color={COLORS.orange} data={saidas} tipo="saida" />}
+          {entradas && <SummaryDetailCard title={t.charts.summaryInbound} color={COLORS.green} data={entradas} tipo="entrada" />}
+          {saidas && <SummaryDetailCard title={t.charts.summaryOutbound} color={COLORS.orange} data={saidas} tipo="saida" />}
         </motion.div>
       )}
     </div>
@@ -131,6 +133,7 @@ const TaxCharts = ({
 const GaugeCard = ({ title, description, atualValue, reformaValue }: {
   title: string; description: string; atualValue: number; reformaValue: number;
 }) => {
+  const t = useI18n();
   const diff = reformaValue - atualValue;
   const isIncrease = diff > 0;
 
@@ -155,7 +158,7 @@ const GaugeCard = ({ title, description, atualValue, reformaValue }: {
                 <span className="text-xl font-bold" style={{ color: COLORS.blue }}>{atualValue.toFixed(1)}%</span>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs" style={{ borderColor: COLORS.blue, color: COLORS.blue }}>Atual</Badge>
+            <Badge variant="outline" className="text-xs" style={{ borderColor: COLORS.blue, color: COLORS.blue }}>{t.charts.current}</Badge>
           </div>
 
           {/* Arrow */}
@@ -174,13 +177,13 @@ const GaugeCard = ({ title, description, atualValue, reformaValue }: {
                 <span className="text-xl font-bold" style={{ color: COLORS.purple }}>{reformaValue.toFixed(1)}%</span>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs" style={{ borderColor: COLORS.purple, color: COLORS.purple }}>Reforma</Badge>
+            <Badge variant="outline" className="text-xs" style={{ borderColor: COLORS.purple, color: COLORS.purple }}>{t.charts.reform}</Badge>
           </div>
         </div>
 
         {/* Diff indicator */}
         <div className={`text-center text-sm font-semibold mt-1 ${Math.abs(diff) < 0.01 ? "text-slate-500" : isIncrease ? "text-red-600" : "text-emerald-600"}`}>
-          {Math.abs(diff) < 0.01 ? "Sem alteração" : `${isIncrease ? "+" : ""}${diff.toFixed(2)} p.p.`}
+          {Math.abs(diff) < 0.01 ? t.charts.noChange : `${isIncrease ? "+" : ""}${diff.toFixed(2)} p.p.`}
         </div>
       </CardContent>
     </Card>
@@ -259,24 +262,25 @@ type SummaryDetailCardProps =
 
 const SummaryDetailCard = (props: SummaryDetailCardProps) => {
   const { title, color } = props;
+  const t = useI18n();
   const rows = props.tipo === "entrada"
     ? [
-        { label: "Compra Bruta", value: formatCurrency(props.data.compra_bruta || 0) },
-        { label: "Créditos", value: formatCurrency(props.data.creditos || 0) },
-        { label: "Compra Líquida", value: formatCurrency(props.data.compra_liquida || 0) },
-        { label: "Carga Atual", value: formatPercent(props.data.carga_tributaria_atual || 0) },
-        { label: "Créditos IBS/CBS", value: formatCurrency(props.data.creditos_ibs_cbs || 0), highlight: true },
-        { label: "Compra Reforma", value: formatCurrency(props.data.compra_total_reforma || 0), highlight: true },
-        { label: "Carga Reforma", value: formatPercent(props.data.carga_tributaria_reforma || 0), highlight: true },
+        { label: t.charts.grossPurchases, value: formatCurrency(props.data.compra_bruta || 0) },
+        { label: t.charts.credits, value: formatCurrency(props.data.creditos || 0) },
+        { label: t.charts.netPurchases, value: formatCurrency(props.data.compra_liquida || 0) },
+        { label: t.charts.currentBurden, value: formatPercent(props.data.carga_tributaria_atual || 0) },
+        { label: t.charts.ibsCbsCredits, value: formatCurrency(props.data.creditos_ibs_cbs || 0), highlight: true },
+        { label: t.charts.reformPurchases, value: formatCurrency(props.data.compra_total_reforma || 0), highlight: true },
+        { label: t.charts.reformBurden, value: formatPercent(props.data.carga_tributaria_reforma || 0), highlight: true },
       ]
     : [
-        { label: "Venda Bruta", value: formatCurrency(props.data.venda_bruta || 0) },
-        { label: "Débitos", value: formatCurrency(props.data.debitos || 0) },
-        { label: "Venda Líquida", value: formatCurrency(props.data.venda_liquida || 0) },
-        { label: "Carga Atual", value: formatPercent(props.data.carga_tributaria_atual || 0) },
-        { label: "Débitos IBS/CBS", value: formatCurrency(props.data.debitos_ibs_cbs || 0), highlight: true },
-        { label: "Venda Reforma", value: formatCurrency(props.data.venda_total_reforma || 0), highlight: true },
-        { label: "Carga Reforma", value: formatPercent(props.data.carga_tributaria_reforma || 0), highlight: true },
+        { label: t.charts.grossSales, value: formatCurrency(props.data.venda_bruta || 0) },
+        { label: t.charts.debits, value: formatCurrency(props.data.debitos || 0) },
+        { label: t.charts.netSales, value: formatCurrency(props.data.venda_liquida || 0) },
+        { label: t.charts.currentBurden, value: formatPercent(props.data.carga_tributaria_atual || 0) },
+        { label: t.charts.ibsCbsDebits, value: formatCurrency(props.data.debitos_ibs_cbs || 0), highlight: true },
+        { label: t.charts.reformSales, value: formatCurrency(props.data.venda_total_reforma || 0), highlight: true },
+        { label: t.charts.reformBurden, value: formatPercent(props.data.carga_tributaria_reforma || 0), highlight: true },
       ];
 
   return (

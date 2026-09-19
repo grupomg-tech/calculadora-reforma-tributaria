@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownRight, Minus, TrendingDown, TrendingUp, DollarSign, Percent } from "lucide-react";
 import { formatCurrency, formatPercent, COLORS } from "./utils";
+import { useI18n } from "@/i18n";
 
 interface ImpactDelta {
   debitos: number;
@@ -26,14 +27,17 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export const ImpactCards = ({ delta }: { delta: ImpactDelta }) => (
-  <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <ImpactCard label="Variação Débitos" value={delta.debitos} isCurrency />
-    <ImpactCard label="Variação Créditos" value={delta.creditos} isCurrency />
-    <ImpactCard label="Variação Resultado" value={delta.resultado} isCurrency />
-    <ImpactCard label="Variação Carga" value={delta.carga} isPercent />
-  </motion.div>
-);
+export const ImpactCards = ({ delta }: { delta: ImpactDelta }) => {
+  const t = useI18n();
+  return (
+    <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <ImpactCard label={t.impact.debits} value={delta.debitos} isCurrency />
+      <ImpactCard label={t.impact.credits} value={delta.creditos} isCurrency />
+      <ImpactCard label={t.impact.result} value={delta.resultado} isCurrency />
+      <ImpactCard label={t.impact.burden} value={delta.carga} isPercent />
+    </motion.div>
+  );
+};
 
 const ImpactCard = ({ label, value, isCurrency, isPercent }: { label: string; value: number; isCurrency?: boolean; isPercent?: boolean }) => {
   const isPositive = value > 0;
@@ -62,31 +66,37 @@ const ImpactCard = ({ label, value, isCurrency, isPercent }: { label: string; va
   );
 };
 
-export const SummaryCards = ({ atual, reforma }: { atual: SummaryData; reforma: SummaryData }) => (
-  <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <SummaryCard title="Sistema Atual" color={COLORS.blue} gradientFrom="#4e6ae9" gradientTo="#6b8cff" data={atual} />
-    <SummaryCard title="Reforma Tributária" color={COLORS.purple} gradientFrom="#764ba2" gradientTo="#9b6fd0" data={reforma} />
-  </motion.div>
-);
+export const SummaryCards = ({ atual, reforma }: { atual: SummaryData; reforma: SummaryData }) => {
+  const t = useI18n();
+  return (
+    <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <SummaryCard title={t.summary.currentSystem} color={COLORS.blue} gradientFrom="#4e6ae9" gradientTo="#6b8cff" data={atual} />
+      <SummaryCard title={t.summary.taxReform} color={COLORS.purple} gradientFrom="#764ba2" gradientTo="#9b6fd0" data={reforma} />
+    </motion.div>
+  );
+};
 
 const SummaryCard = ({ title, color, gradientFrom, gradientTo, data }: {
   title: string; color: string; gradientFrom: string; gradientTo: string; data: SummaryData;
-}) => (
-  <motion.div variants={item}>
-    <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-none">
-      <div className="h-2" style={{ background: `linear-gradient(90deg, ${gradientFrom}, ${gradientTo})` }} />
-      <CardContent className="pt-5 pb-5">
-        <h3 className="text-lg font-bold mb-4" style={{ color }}>{title}</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <MetricItem icon={<TrendingDown className="h-4 w-4" />} label="Débitos" value={formatCurrency(data.debitos)} color={COLORS.red} />
-          <MetricItem icon={<TrendingUp className="h-4 w-4" />} label="Créditos" value={formatCurrency(data.creditos)} color={COLORS.green} />
-          <MetricItem icon={<DollarSign className="h-4 w-4" />} label="Resultado" value={formatCurrency(data.resultado)} color={color} />
-          <MetricItem icon={<Percent className="h-4 w-4" />} label="Carga Efetiva" value={formatPercent(data.carga_tributaria_efetiva)} color={color} />
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+}) => {
+  const t = useI18n();
+  return (
+    <motion.div variants={item}>
+      <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-none">
+        <div className="h-2" style={{ background: `linear-gradient(90deg, ${gradientFrom}, ${gradientTo})` }} />
+        <CardContent className="pt-5 pb-5">
+          <h3 className="text-lg font-bold mb-4" style={{ color }}>{title}</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <MetricItem icon={<TrendingDown className="h-4 w-4" />} label={t.summary.debits} value={formatCurrency(data.debitos)} color={COLORS.red} />
+            <MetricItem icon={<TrendingUp className="h-4 w-4" />} label={t.summary.credits} value={formatCurrency(data.creditos)} color={COLORS.green} />
+            <MetricItem icon={<DollarSign className="h-4 w-4" />} label={t.summary.result} value={formatCurrency(data.resultado)} color={color} />
+            <MetricItem icon={<Percent className="h-4 w-4" />} label={t.summary.effectiveBurden} value={formatPercent(data.carga_tributaria_efetiva)} color={color} />
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
 
 const MetricItem = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) => (
   <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/40 transition-colors">

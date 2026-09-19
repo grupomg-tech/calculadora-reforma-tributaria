@@ -35,6 +35,7 @@ FilterPanel ──(empresa, período, alíquotas)──▶ Index.fetchData
 | `src/lib/export.ts` | `toCsv(report)` serialises purchases and sales as a pt-BR CSV (`;` / `,` / UTF-8 BOM). `downloadCsv` triggers the browser download. | `export.test.ts` |
 | `src/lib/demo.ts` | Fictional catalogue and a simplified tax model that produce a complete `DadosRelatorio` for any set of rates. | `demo.test.ts` |
 | `src/lib/config.ts` | Runtime configuration from `VITE_*` variables and the `?demo` flag. | `Index.test.tsx` |
+| `src/i18n/` | Plain string catalogs (`pt-BR`, `en`) and `resolveLocale` (`?lang=` → navigator → pt-BR). | `i18n/index.test.ts` |
 | `src/pages/Index.tsx` | State (filters, data, loading, error, demo), fetching, auto refresh, page layout, CSV export button. | `Index.test.tsx` |
 | `src/components/dashboard/FilterPanel.tsx` | Controlled form for company, period and rates. | `FilterPanel.test.tsx` |
 | `src/components/dashboard/ImpactOverview.tsx` | Impact cards, summary cards and header badges. | `Index.test.tsx` (rendering) |
@@ -61,6 +62,9 @@ FilterPanel ──(empresa, período, alíquotas)──▶ Index.fetchData
    production URL by accident.
 4. **Demo mode is explicit.** It is entered only through `?demo=1`, `VITE_DEMO`
    or the fallback button shown on API errors, and always displays a banner.
+5. **UI language is not number language.** Catalogs cover chrome only. Formatters
+   in `dashboard/utils.ts` stay `pt-BR` / `BRL` so Brazilian figures do not
+   change when the UI is English.
 
 ## Build output
 

@@ -147,6 +147,21 @@ describe("<Index />", () => {
     expect(screen.getByText(/Demo with fictional data/)).toBeInTheDocument();
   });
 
+  it("switches the UI to English when ?lang=en and keeps BRL formatting", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    setSearch("?demo=1&lang=en");
+
+    render(<Index />);
+
+    await waitFor(() => expect(screen.getByText("Tax Reform Calculator")).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: /Simulate/ })).toBeInTheDocument();
+    expect(screen.getByText("Featured products")).toBeInTheDocument();
+    expect(screen.getByText("Current system")).toBeInTheDocument();
+    expect(screen.queryByText("Produtos em Destaque")).not.toBeInTheDocument();
+    expect(screen.queryByText("Calculadora Reforma Tributária")).not.toBeInTheDocument();
+    expect(screen.getAllByText(/R\$/).length).toBeGreaterThan(0);
+  });
+
   it("reads filters from the query string", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(relatorio));
     vi.stubGlobal("fetch", fetchMock);

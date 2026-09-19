@@ -45,7 +45,7 @@ the same commands.
 - Defaults in `src/lib/config.ts` and `vite.config.ts` must keep working for the
   original deployment paths (`/static/dashboard-cliente/`,
   `/dashboards/dashboard-cliente`, `/dashboards/api/graficos/dados-relatorio/`).
-- UI text is pt-BR; code, comments, commit messages and docs are English.
+- UI text lives in `src/i18n/` (pt-BR default, English via `?lang=en`); code, comments, commit messages and docs are English. Number and currency formatting stay pt-BR / BRL.
 - Commit messages: Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
   `build:`, `ci:`, `chore(deps):`, `refactor:`).
 - Fictional data only. Never add real company names, CNPJs or figures to

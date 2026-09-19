@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ROUTER_BASENAME } from "@/lib/config";
+import { applyDocumentLocale, messagesFor, resolveLocale } from "@/i18n";
 
 export class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: string }> {
   constructor(props: { children: ReactNode }) {
@@ -15,16 +16,17 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { hasError
   }
   render() {
     if (this.state.hasError) {
+      const t = messagesFor(resolveLocale());
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-8">
           <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center space-y-4">
-            <h2 className="text-xl font-bold text-red-600">⚠️ Erro na aplicação</h2>
+            <h2 className="text-xl font-bold text-red-600">{t.errors.appTitle}</h2>
             <p className="text-muted-foreground">{this.state.error}</p>
             <button
               onClick={() => { this.setState({ hasError: false, error: "" }); window.location.reload(); }}
               className="px-4 py-2 bg-[#4e6ae9] text-white rounded-md hover:bg-[#3d59d8]"
             >
-              Recarregar
+              {t.errors.reload}
             </button>
           </div>
         </div>
@@ -53,8 +55,14 @@ export const AppRoutes = () => (
   </Routes>
 );
 
+const DocumentLocale = () => {
+  useEffect(() => { applyDocumentLocale(); }, []);
+  return null;
+};
+
 const App = () => (
   <ErrorBoundary>
+    <DocumentLocale />
     <UnhandledRejectionHandler />
     <BrowserRouter basename={ROUTER_BASENAME}>
       <AppRoutes />

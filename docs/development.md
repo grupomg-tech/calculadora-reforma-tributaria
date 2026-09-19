@@ -50,8 +50,9 @@ integration.
   when the backend gains a field.
 - Put computation in `src/lib` as pure functions with tests; keep components
   presentational.
-- UI strings are Portuguese (pt-BR) for now; code, comments and docs are
-  English.
+- UI strings live in `src/i18n/pt-BR.ts` and `src/i18n/en.ts`. Language comes
+  from `?lang=en|pt-BR`, then `navigator.language`, then pt-BR. Numbers and
+  currency stay pt-BR / BRL. Code, comments and docs are English.
 - Do not edit `src/components/ui/*` by hand. Regenerate with the shadcn CLI if a
   primitive needs to change, and only keep primitives that are imported.
 - Commit messages follow the Conventional Commits style used in the history:
@@ -70,6 +71,6 @@ short-lived branches named `<type>/<topic>` (for example `test/top-products`,
   returning HTML (login page, 404 page) is reported as
   "API retornou HTML em vez de JSON".
 - `?demo=1` bypasses the network entirely, which isolates UI bugs from backend
-  bugs.
+  bugs. Add `&lang=en` to review the English UI.
 - Recharts needs a sized container; in tests `ResizeObserver` is stubbed and
   charts render empty, which is expected.

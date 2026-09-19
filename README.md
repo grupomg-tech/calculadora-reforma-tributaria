@@ -10,7 +10,7 @@ Open-source dashboard that simulates the impact of Brazil's consumption tax refo
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status: early stage](https://img.shields.io/badge/status-early%20stage-orange.svg)
 
-**Live demo:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> — runs on a built-in fictional dataset; change the IBS, CBS and IS rates and click *Simular* to recalculate.
+**Live demo:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> — runs on a built-in fictional dataset; change the IBS, CBS and IS rates and click *Simular* to recalculate. Append `?lang=en` for the English UI (numbers stay Brazilian).
 
 ![Calculadora Reforma Tributária screenshot](docs/screenshot.png)
 
@@ -36,6 +36,7 @@ Constitutional Amendment 132/2023 replaces PIS, COFINS, ICMS, ISS and part of IP
 - **Filters** — company, start and end period; filters can be preset through the URL query string.
 - **Demo mode** — a fictional catalogue of 12 products (basic-basket items at zero rate, reduced-rate goods, products subject to IS) lets you explore the dashboard without a backend.
 - **CSV export** — "Exportar CSV" in the header downloads every purchase and sale product for the loaded report (`;` separator, `,` decimal mark, UTF-8 with BOM).
+- **English UI** — add `?lang=en` (or use an English browser language). Figures stay formatted as pt-BR / BRL.
 - **Auto refresh** — optional 30-second polling.
 
 ## What it does not do
@@ -48,7 +49,7 @@ Constitutional Amendment 132/2023 replaces PIS, COFINS, ICMS, ISS and part of IP
 
 ## Status
 
-Early stage, actively maintained by a single developer. The dashboard is functional; the data mapping, the demo model, the page and the main components are covered by 70 tests (about 92% statement coverage over `src/`, with an 80% threshold enforced in CI). Dependencies are kept current by Dependabot and audited weekly. The UI is Portuguese-only for now. See the [roadmap](#roadmap) and the [open issues](https://github.com/grupomg-tech/calculadora-reforma-tributaria/issues); contributions are welcome — read [CONTRIBUTING.md](CONTRIBUTING.md).
+Early stage, actively maintained by a single developer. The dashboard is functional; the data mapping, the demo model, the page and the main components are covered by 82 tests (about 93% statement coverage over `src/`, with an 80% threshold enforced in CI). Dependencies are kept current by Dependabot and audited weekly. The UI defaults to Portuguese and switches to English with `?lang=en` (or an English browser); numbers and currency stay pt-BR / BRL. See the [roadmap](#roadmap) and the [open issues](https://github.com/grupomg-tech/calculadora-reforma-tributaria/issues); contributions are welcome — read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tech stack
 
@@ -65,7 +66,7 @@ npm ci
 npm run dev      # dev server on http://localhost:8080
 ```
 
-Then open <http://localhost:8080/dashboards/dashboard-cliente/?demo=1> for the demo dataset, or point the app at your backend (see below).
+Then open <http://localhost:8080/dashboards/dashboard-cliente/?demo=1> for the demo dataset (add `&lang=en` for English chrome), or point the app at your backend (see below).
 
 Other scripts:
 
@@ -158,6 +159,7 @@ src/
 │   ├── export.ts                    # CSV serialisation of the report (+ tests)
 │   ├── demo.ts                      # fictional dataset for demo mode (+ tests)
 │   └── config.ts                    # env-based configuration
+├── i18n/                            # pt-BR + en catalogs, locale selector
 ├── pages/Index.tsx                  # data fetching and page layout
 └── components/dashboard/
     ├── FilterPanel.tsx              # company, period and rate filters (+ tests)
@@ -176,7 +178,7 @@ src/
 - [ ] Classification of products (NCM) into the reform's differentiated regimes, with legal references
 - [x] Export the simulation to CSV
 - [ ] Export the simulation to PDF
-- [ ] English UI (i18n)
+- [x] English UI (i18n)
 
 ## Documentation
 
@@ -228,6 +230,6 @@ This is a simulation tool. Results depend entirely on the data and rates supplie
 
 O `calculadora-reforma-tributaria` é um painel (React + TypeScript) que compara a apuração tributária de uma empresa no **sistema atual** com a apuração simulada na **Reforma Tributária** (IBS, CBS e Imposto Seletivo). Permite ajustar as alíquotas, filtrar por empresa e período, ver a variação de débitos, créditos, resultado e carga tributária, analisar os produtos mais comprados e mais vendidos, e exportar a simulação em CSV para planilha.
 
-**Demo online:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> (dados fictícios; altere as alíquotas e clique em *Simular*).
+**Demo online:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> (dados fictícios; altere as alíquotas e clique em *Simular*). Interface em inglês: `?lang=en` (números continuam em pt-BR / BRL).
 
 Este repositório contém apenas o front end; os dados vêm de uma API própria (veja [Backend API](#backend-api)). Para rodar sem backend, abra a aplicação com `?demo=1`. Projeto em estágio inicial — contribuições são bem-vindas. Ferramenta de simulação: não substitui orientação tributária profissional.

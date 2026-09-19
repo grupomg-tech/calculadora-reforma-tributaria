@@ -15,8 +15,10 @@ import { csvFileName, downloadCsv, toCsv } from "@/lib/export";
 import {
   computeImpactDelta, deriveBurdenBar, deriveComparativo, derivePieData, parseApiResponse,
 } from "@/lib/report";
+import { interpolate, useI18n } from "@/i18n";
 
 const Index = () => {
+  const t = useI18n();
   const urlParams = new URLSearchParams(window.location.search);
   const [empresa, setEmpresa] = useState(urlParams.get("empresa") || "");
   const [periodoInicial, setPeriodoInicial] = useState(urlParams.get("periodo_inicial") || "");
@@ -56,19 +58,19 @@ const Index = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) throw new Error(`Erro HTTP ${res.status}`);
+      if (!res.ok) throw new Error(interpolate(t.errors.http, { status: res.status }));
       setData(parseApiResponse(await res.text()));
     } catch (e) {
       const message = e instanceof Error ? e.message : "";
       setError(
         message === "Failed to fetch"
-          ? "Não foi possível conectar à API. Verifique se o servidor está rodando."
-          : message || "Erro ao buscar dados"
+          ? t.errors.network
+          : message || t.errors.generic
       );
     } finally {
       setLoading(false);
     }
-  }, [demo, empresa, periodoInicial, periodoFinal, aliquotaIbs, aliquotaCbs, aliquotaIs]);
+  }, [demo, empresa, periodoInicial, periodoFinal, aliquotaIbs, aliquotaCbs, aliquotaIs, t]);
 
   // Fetch once on mount and whenever demo mode is toggled.
   useEffect(() => { fetchData(); }, [demo]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -90,6 +92,7 @@ const Index = () => {
   const produtosSaida = data?.saidas?.produtos || [];
 
   const impactoDelta = computeImpactDelta(resumoAtual, resumoReforma);
+  // Category names on BurdenBar are data keys (unchanged across locales).
   const barDataCompras = deriveBurdenBar("Compras", graficos.carga_tributaria_compras, data?.entradas);
   const barDataVendas = deriveBurdenBar("Vendas", graficos.carga_tributaria_vendas, data?.saidas);
   const pieDataEntradas = derivePieData(graficos.tributos_entradas, produtosEntrada);
@@ -104,15 +107,15 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#4e6ae9] to-[#764ba2] bg-clip-text text-transparent">
-              Calculadora Reforma Tributária
+              {t.header.title}
             </h1>
-            <p className="text-sm text-muted-foreground">Análise comparativa de impacto fiscal • Interativo</p>
+            <p className="text-sm text-muted-foreground">{t.header.subtitle}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {data && impactoDelta && (
               <div className="hidden md:flex items-center gap-3">
-                <ImpactBadge label="Impacto Carga" value={impactoDelta.carga} suffix="pp" />
-                <ImpactBadge label="Impacto Resultado" value={impactoDelta.resultado} prefix="R$" />
+                <ImpactBadge label={t.header.burdenImpact} value={impactoDelta.carga} suffix="pp" />
+                <ImpactBadge label={t.header.resultImpact} value={impactoDelta.resultado} prefix="R$" />
               </div>
             )}
             <Button
@@ -123,16 +126,16 @@ const Index = () => {
               onClick={() => { if (data) downloadCsv(toCsv(data), csvFileName({ empresa, periodoInicial, periodoFinal })); }}
               className="bg-white/80"
             >
-              <Download className="h-4 w-4" /> Exportar CSV
+              <Download className="h-4 w-4" /> {t.header.exportCsv}
             </Button>
             <a
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 rounded-md border bg-white/80 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-white"
-              title="Código-fonte, documentação e contrato da API no GitHub"
+              title={t.header.githubTitle}
             >
-              <ExternalLink className="h-4 w-4" /> GitHub · README
+              <ExternalLink className="h-4 w-4" /> {t.header.githubLink}
             </a>
           </div>
         </div>
@@ -144,11 +147,10 @@ const Index = () => {
           <div role="status" className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
             <FlaskConical className="h-4 w-4 shrink-0" />
             <span>
-              <strong>Modo demonstração:</strong> dados fictícios gerados localmente. Altere as alíquotas e clique em
-              Simular para recalcular a simulação.
+              <strong>{t.demo.lead}</strong> {t.demo.body}
               <span className="block text-xs text-amber-700">
-                Demo with fictional data — source code and API contract on{" "}
-                <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="underline">GitHub</a>.
+                {t.demo.source}{" "}
+                <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="underline">{t.demo.sourceLink}</a>.
               </span>
             </span>
           </div>
@@ -188,7 +190,7 @@ const Index = () => {
                 <span className="flex items-center gap-2"><AlertTriangle className="h-5 w-5" /> {error}</span>
                 {!demo && (
                   <Button variant="outline" size="sm" onClick={() => setDemo(true)}>
-                    <FlaskConical className="h-4 w-4 mr-1" /> Ver com dados de exemplo
+                    <FlaskConical className="h-4 w-4 mr-1" /> {t.errors.fallbackSample}
                   </Button>
                 )}
               </CardContent>

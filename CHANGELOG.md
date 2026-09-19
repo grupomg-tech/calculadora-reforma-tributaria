@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- English UI via plain catalogs (`src/i18n/pt-BR.ts`, `src/i18n/en.ts`), no i18n
+  library. `?lang=en|pt-BR` wins, then `navigator.language`, then pt-BR. Number
+  and currency formatting stay pt-BR / BRL (#19).
 - CSV export of the loaded report: header button "Exportar CSV" (enabled when
   a report is present) downloads one row per purchase and sale product, with
   the `Produto` columns plus `tipo`, `;` as separator, `,` as decimal mark and
