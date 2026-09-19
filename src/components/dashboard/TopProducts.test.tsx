@@ -81,6 +81,19 @@ describe("<TopProducts />", () => {
     expect(screen.getByTitle("Refrigerante cola garrafa retornável 2 litros")).toHaveTextContent("Refrigerante cola garrafa retornável 2 litros");
   });
 
+  it("renders print tables for both rankings regardless of the active tab", () => {
+    const vendas = Array.from({ length: 12 }, (_, i) => produto(i + 1));
+    render(<TopProducts produtosEntrada={[produto(9)]} produtosSaida={vendas} />);
+
+    const salesTable = screen.getByRole("table", { name: /Top 10 — Vendas/ });
+    const buyTable = screen.getByRole("table", { name: /Top 10 — Compras/ });
+    expect(within(salesTable).getAllByRole("row")).toHaveLength(11);
+    expect(within(salesTable).getByText("Produto 12")).toBeInTheDocument();
+    expect(within(salesTable).queryByText("Produto 01")).not.toBeInTheDocument();
+    expect(within(buyTable).getByText("Produto 09")).toBeInTheDocument();
+    expect(screen.getByLabelText("Tabelas top 10 para impressão")).toHaveAttribute("data-print", "only");
+  });
+
   it("uses the purchases tab for inbound products", () => {
     render(<TopProducts produtosEntrada={[produto(5)]} produtosSaida={[]} />);
 

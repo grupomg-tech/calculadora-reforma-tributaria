@@ -73,3 +73,7 @@ short-lived branches named `<type>/<topic>` (for example `test/top-products`,
   bugs.
 - Recharts needs a sized container; in tests `ResizeObserver` is stubbed and
   charts render empty, which is expected.
+- **Exportar PDF** uses the browser print dialog (`window.print()`) plus the
+  `@media print` rules in `src/index.css`. Choose "Save as PDF" / "Salvar como
+  PDF" in the dialog. Filters, charts and other chrome are hidden; the printed
+  page is the impact cards, the two summary blocks and the top-10 tables.

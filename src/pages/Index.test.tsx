@@ -103,13 +103,41 @@ describe("<Index />", () => {
     });
   });
 
-  it("keeps Exportar CSV disabled until a report is loaded", async () => {
+  it("keeps Exportar CSV and Exportar PDF disabled until a report is loaded", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse("nf", 404)));
 
     render(<Index />);
 
     await waitFor(() => expect(screen.getByText(/Erro HTTP 404/)).toBeInTheDocument());
     expect(screen.getByRole("button", { name: /Exportar CSV/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Exportar PDF/ })).toBeDisabled();
+  });
+
+  it("opens the print dialog from Exportar PDF in demo mode", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    setSearch("?demo=1");
+    const printSpy = vi.spyOn(exportModule, "printReport").mockImplementation(() => undefined);
+
+    render(<Index />);
+
+    const button = await screen.findByRole("button", { name: /Exportar PDF/ });
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+
+    expect(printSpy).toHaveBeenCalledTimes(1);
+    expect(printSpy.mock.calls[0][0]).toBe("calculadora-reforma-tributaria");
+  });
+
+  it("names the printed PDF from the filter query string", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(relatorio)));
+    setSearch("?empresa=42&periodo_inicial=2026-01&periodo_final=2026-06");
+    const printSpy = vi.spyOn(exportModule, "printReport").mockImplementation(() => undefined);
+
+    render(<Index />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /Exportar PDF/ }));
+    expect(printSpy).toHaveBeenCalledWith("calculadora-reforma-tributaria_42_2026-01_2026-06");
+    expect(screen.getByText(/Empresa 42 · 2026-01 – 2026-06 · IBS 18,5%/)).toBeInTheDocument();
   });
 
   it("downloads a CSV from the header in demo mode", async () => {

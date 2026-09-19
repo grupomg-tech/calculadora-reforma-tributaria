@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Download, ExternalLink, FlaskConical } from "lucide-react";
+import { AlertTriangle, Download, ExternalLink, FlaskConical, Printer } from "lucide-react";
 import FilterPanel from "@/components/dashboard/FilterPanel";
 import { ImpactCards, SummaryCards, ImpactBadge } from "@/components/dashboard/ImpactOverview";
 import TopProducts from "@/components/dashboard/TopProducts";
@@ -11,7 +11,7 @@ import TaxCharts from "@/components/dashboard/TaxCharts";
 import type { DadosRelatorio } from "@/lib/api-types";
 import { API_URL, REPO_URL, isDemoMode } from "@/lib/config";
 import { buildDemoReport } from "@/lib/demo";
-import { csvFileName, downloadCsv, toCsv } from "@/lib/export";
+import { csvFileName, downloadCsv, printDocumentTitle, printMetaLine, printReport, toCsv } from "@/lib/export";
 import {
   computeImpactDelta, deriveBurdenBar, deriveComparativo, derivePieData, parseApiResponse,
 } from "@/lib/report";
@@ -98,17 +98,20 @@ const Index = () => {
   const comparativoSaidas = deriveComparativo(graficos.comparativo_saidas);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="print-report min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Header */}
-      <header className="bg-white/70 backdrop-blur-md border-b shadow-sm sticky top-0 z-10">
+      <header className="bg-white/70 backdrop-blur-md border-b shadow-sm sticky top-0 z-10" data-print="keep">
         <div className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#4e6ae9] to-[#764ba2] bg-clip-text text-transparent">
               Calculadora Reforma Tributária
             </h1>
-            <p className="text-sm text-muted-foreground">Análise comparativa de impacto fiscal • Interativo</p>
+            <p className="text-sm text-muted-foreground" data-print="hide">Análise comparativa de impacto fiscal • Interativo</p>
+            <p className="hidden text-sm text-muted-foreground" data-print="only">
+              {printMetaLine({ empresa, periodoInicial, periodoFinal, aliquotaIbs, aliquotaCbs, aliquotaIs })}
+            </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3" data-print="hide">
             {data && impactoDelta && (
               <div className="hidden md:flex items-center gap-3">
                 <ImpactBadge label="Impacto Carga" value={impactoDelta.carga} suffix="pp" />
@@ -124,6 +127,16 @@ const Index = () => {
               className="bg-white/80"
             >
               <Download className="h-4 w-4" /> Exportar CSV
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!data}
+              onClick={() => { if (data) printReport(printDocumentTitle({ empresa, periodoInicial, periodoFinal })); }}
+              className="bg-white/80"
+            >
+              <Printer className="h-4 w-4" /> Exportar PDF
             </Button>
             <a
               href={REPO_URL}
@@ -141,7 +154,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Demo banner */}
         {demo && (
-          <div role="status" className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          <div role="status" data-print="hide" className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
             <FlaskConical className="h-4 w-4 shrink-0" />
             <span>
               <strong>Modo demonstração:</strong> dados fictícios gerados localmente. Altere as alíquotas e clique em
@@ -155,20 +168,22 @@ const Index = () => {
         )}
 
         {/* Filters */}
-        <FilterPanel
-          empresa={empresa} setEmpresa={setEmpresa}
-          periodoInicial={periodoInicial} setPeriodoInicial={setPeriodoInicial}
-          periodoFinal={periodoFinal} setPeriodoFinal={setPeriodoFinal}
-          aliquotaIbs={aliquotaIbs} setAliquotaIbs={setAliquotaIbs}
-          aliquotaCbs={aliquotaCbs} setAliquotaCbs={setAliquotaCbs}
-          aliquotaIs={aliquotaIs} setAliquotaIs={setAliquotaIs}
-          loading={loading} autoRefresh={autoRefresh} setAutoRefresh={setAutoRefresh}
-          onSubmit={fetchData}
-        />
+        <div data-print="hide">
+          <FilterPanel
+            empresa={empresa} setEmpresa={setEmpresa}
+            periodoInicial={periodoInicial} setPeriodoInicial={setPeriodoInicial}
+            periodoFinal={periodoFinal} setPeriodoFinal={setPeriodoFinal}
+            aliquotaIbs={aliquotaIbs} setAliquotaIbs={setAliquotaIbs}
+            aliquotaCbs={aliquotaCbs} setAliquotaCbs={setAliquotaCbs}
+            aliquotaIs={aliquotaIs} setAliquotaIs={setAliquotaIs}
+            loading={loading} autoRefresh={autoRefresh} setAutoRefresh={setAutoRefresh}
+            onSubmit={fetchData}
+          />
+        </div>
 
         {/* Loading */}
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div data-print="hide" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="shadow-lg border-none">
                 <CardContent className="pt-6 space-y-3">
@@ -182,7 +197,7 @@ const Index = () => {
 
         {/* Error */}
         {error && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div data-print="hide" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="border-red-200 bg-red-50 shadow-lg border-none">
               <CardContent className="pt-6 text-center text-red-600 font-medium flex flex-col items-center justify-center gap-3">
                 <span className="flex items-center gap-2"><AlertTriangle className="h-5 w-5" /> {error}</span>
@@ -211,16 +226,18 @@ const Index = () => {
             <TopProducts produtosEntrada={produtosEntrada} produtosSaida={produtosSaida} />
 
             {/* Tax Charts */}
-            <TaxCharts
-              barDataCompras={barDataCompras}
-              barDataVendas={barDataVendas}
-              pieDataEntradas={pieDataEntradas}
-              pieDataSaidas={pieDataSaidas}
-              comparativoEntradas={comparativoEntradas}
-              comparativoSaidas={comparativoSaidas}
-              entradas={data?.entradas}
-              saidas={data?.saidas}
-            />
+            <div data-print="hide">
+              <TaxCharts
+                barDataCompras={barDataCompras}
+                barDataVendas={barDataVendas}
+                pieDataEntradas={pieDataEntradas}
+                pieDataSaidas={pieDataSaidas}
+                comparativoEntradas={comparativoEntradas}
+                comparativoSaidas={comparativoSaidas}
+                entradas={data?.entradas}
+                saidas={data?.saidas}
+              />
+            </div>
           </div>
         )}
       </main>

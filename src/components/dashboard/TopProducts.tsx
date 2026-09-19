@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShoppingCart, Store, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Package, BarChart3, Activity } from "lucide-react";
 import { COLORS, formatCurrency, formatCurrencyShort, formatPercent, formatNumber, tooltipCurrency } from "./utils";
 import type { Produto } from "@/lib/api-types";
+import { rankTopProducts } from "@/lib/report";
 
 type Tipo = "compra" | "venda";
 const productName = (p: Produto) => p.descricao || p.nome || p.produto || "Produto";
@@ -28,9 +29,8 @@ const TopProducts = ({ produtosEntrada, produtosSaida }: TopProductsProps) => {
 
   if (!produtosEntrada.length && !produtosSaida.length) return null;
 
-  // Sort by valor_total descending for top products
-  const topCompras = [...produtosEntrada].sort((a, b) => (b.valor_total || 0) - (a.valor_total || 0)).slice(0, 10);
-  const topVendas = [...produtosSaida].sort((a, b) => (b.valor_total || 0) - (a.valor_total || 0)).slice(0, 10);
+  const topCompras = rankTopProducts(produtosEntrada);
+  const topVendas = rankTopProducts(produtosSaida);
 
   const openDetail = (produto: Produto, tipo: Tipo) => {
     setSelectedProduct(produto);
@@ -39,7 +39,7 @@ const TopProducts = ({ produtosEntrada, produtosSaida }: TopProductsProps) => {
 
   return (
     <>
-      <Tabs defaultValue="mais-vendidos" className="space-y-4">
+      <Tabs defaultValue="mais-vendidos" className="space-y-4" data-print="hide">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -81,6 +81,8 @@ const TopProducts = ({ produtosEntrada, produtosSaida }: TopProductsProps) => {
         </TabsContent>
       </Tabs>
 
+      <PrintTopTables compras={topCompras} vendas={topVendas} />
+
       {/* Product Detail Dialog */}
       <ProductDetailDialog
         product={selectedProduct}
@@ -91,6 +93,51 @@ const TopProducts = ({ produtosEntrada, produtosSaida }: TopProductsProps) => {
     </>
   );
 };
+
+const PrintTopTables = ({ compras, vendas }: { compras: Produto[]; vendas: Produto[] }) => (
+  <section
+    className="hidden"
+    data-print="only"
+    data-print-layout="stack"
+    aria-label="Tabelas top 10 para impressão"
+  >
+    <PrintProductTable title="Top 10 — Vendas" products={vendas} />
+    <PrintProductTable title="Top 10 — Compras" products={compras} />
+  </section>
+);
+
+const PrintProductTable = ({ title, products }: { title: string; products: Produto[] }) => (
+  <div data-print="keep">
+    <h3 className="print-top-heading">{title}</h3>
+    {products.length === 0 ? (
+      <p className="print-top-empty">Nenhum produto</p>
+    ) : (
+      <table className="print-top-table">
+        <caption className="sr-only">{title}</caption>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Atual</th>
+            <th scope="col">Reforma</th>
+            <th scope="col">Diferença</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product, index) => (
+            <tr key={`${productName(product)}-${index}`}>
+              <td>{index + 1}</td>
+              <td>{productName(product)}</td>
+              <td>{formatCurrency(product.valor_total ?? 0)}</td>
+              <td>{formatCurrency(product.total_reforma ?? 0)}</td>
+              <td>{formatCurrency(product.dif_total ?? 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+);
 
 const ProductRankingChart = ({ products, tipo, onProductClick }: { products: Produto[]; tipo: Tipo; onProductClick: (p: Produto, t: Tipo) => void }) => {
   const chartData = products.map((p) => ({

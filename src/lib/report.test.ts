@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   computeImpactDelta, deriveBurdenBar, deriveComparativo, derivePieData, parseApiResponse,
+  rankTopProducts,
 } from "./report";
 
 describe("parseApiResponse", () => {
@@ -135,5 +136,24 @@ describe("deriveComparativo", () => {
 
   it("returns an empty list without a chart", () => {
     expect(deriveComparativo(undefined)).toEqual([]);
+  });
+});
+
+describe("rankTopProducts", () => {
+  it("orders by valor_total descending and caps at 10", () => {
+    const produtos = Array.from({ length: 12 }, (_, i) => ({ descricao: `P${i}`, valor_total: i }));
+    const ranked = rankTopProducts(produtos);
+    expect(ranked).toHaveLength(10);
+    expect(ranked[0].descricao).toBe("P11");
+    expect(ranked[9].descricao).toBe("P2");
+  });
+
+  it("returns an empty list without products and does not mutate the input", () => {
+    expect(rankTopProducts()).toEqual([]);
+    expect(rankTopProducts([])).toEqual([]);
+    const produtos = [{ valor_total: 1 }, { valor_total: 3 }];
+    const copy = [...produtos];
+    rankTopProducts(produtos);
+    expect(produtos).toEqual(copy);
   });
 });

@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- PDF / print export of the loaded report: header button "Exportar PDF" (enabled
+  when a report is present) opens the browser print dialog (`window.print()`).
+  A print stylesheet (`@media print`) lays out one A4 page with the impact
+  cards, the two summary blocks and top-10 purchase/sale tables, and hides
+  filters, charts, the demo banner and other chrome. No PDF library (#18).
 - CSV export of the loaded report: header button "Exportar CSV" (enabled when
   a report is present) downloads one row per purchase and sale product, with
   the `Produto` columns plus `tipo`, `;` as separator, `,` as decimal mark and

@@ -27,7 +27,7 @@ const item = {
 };
 
 export const ImpactCards = ({ delta }: { delta: ImpactDelta }) => (
-  <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <motion.div data-print="keep" variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4 print:grid-cols-4 print:gap-2">
     <ImpactCard label="Variação Débitos" value={delta.debitos} isCurrency />
     <ImpactCard label="Variação Créditos" value={delta.creditos} isCurrency />
     <ImpactCard label="Variação Resultado" value={delta.resultado} isCurrency />
@@ -63,7 +63,7 @@ const ImpactCard = ({ label, value, isCurrency, isPercent }: { label: string; va
 };
 
 export const SummaryCards = ({ atual, reforma }: { atual: SummaryData; reforma: SummaryData }) => (
-  <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <motion.div data-print="keep" variants={container} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:grid-cols-2 print:gap-3">
     <SummaryCard title="Sistema Atual" color={COLORS.blue} gradientFrom="#4e6ae9" gradientTo="#6b8cff" data={atual} />
     <SummaryCard title="Reforma Tributária" color={COLORS.purple} gradientFrom="#764ba2" gradientTo="#9b6fd0" data={reforma} />
   </motion.div>

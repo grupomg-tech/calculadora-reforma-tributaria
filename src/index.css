@@ -103,3 +103,164 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * Print / PDF export (#18). One A4 page with the impact cards, the two
+ * summary blocks and the top-10 tables stacked at full width. Chrome, filters,
+ * charts and other interactive chrome are hidden via [data-print="hide"]. No
+ * extra library: "Exportar PDF" calls window.print() and the user saves as PDF.
+ */
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    background: #fff !important;
+    color: #111 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .print-report,
+  .print-report.min-h-screen {
+    min-height: 0 !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  [data-print="only"] {
+    display: block !important;
+  }
+
+  [data-print="only"][data-print-layout="stack"] {
+    display: flex !important;
+    flex-direction: column;
+    gap: 3.5mm;
+    margin-top: 3mm;
+  }
+
+  [data-print="keep"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-report header {
+    position: static !important;
+    background: #fff !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid #ccc !important;
+    padding: 0 !important;
+  }
+
+  .print-report header .container {
+    padding-top: 0 !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .print-report header h1 {
+    font-size: 14pt !important;
+    line-height: 1.2 !important;
+    background: none !important;
+    -webkit-text-fill-color: #3d4f9c !important;
+    color: #3d4f9c !important;
+  }
+
+  .print-report main {
+    padding-top: 2mm !important;
+    padding-bottom: 0 !important;
+  }
+
+  .print-report main .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 3mm !important;
+  }
+
+  .print-report [role="dialog"],
+  .print-report [data-radix-popper-content-wrapper],
+  .print-report .recharts-responsive-container,
+  .print-report .recharts-wrapper {
+    display: none !important;
+  }
+
+  .print-top-heading {
+    font-size: 10pt;
+    font-weight: 700;
+    margin: 0 0 1.5mm;
+  }
+
+  .print-top-empty {
+    font-size: 8pt;
+    color: #555;
+    margin: 0;
+  }
+
+  table.print-top-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 8pt;
+    line-height: 1.3;
+  }
+
+  table.print-top-table caption {
+    display: none !important;
+  }
+
+  table.print-top-table th,
+  table.print-top-table td {
+    border: 1px solid #ccc;
+    padding: 1.5pt 4pt;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  table.print-top-table th {
+    background: #f3f3f3;
+    font-weight: 600;
+  }
+
+  table.print-top-table th:nth-child(1),
+  table.print-top-table td:nth-child(1) {
+    width: 8mm;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  table.print-top-table th:nth-child(2),
+  table.print-top-table td:nth-child(2) {
+    width: auto;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  table.print-top-table th:nth-child(n + 3),
+  table.print-top-table td:nth-child(n + 3) {
+    width: 28mm;
+    text-align: right;
+    white-space: nowrap;
+  }
+}

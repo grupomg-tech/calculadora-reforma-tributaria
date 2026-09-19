@@ -8,6 +8,9 @@ import {
   csvFileName,
   CSV_SEPARATOR,
   downloadCsv,
+  printDocumentTitle,
+  printMetaLine,
+  printReport,
   toCsv,
 } from "./export";
 
@@ -115,5 +118,60 @@ describe("csvFileName", () => {
     expect(csvFileName({ empresa: "42", periodoInicial: "2026-01", periodoFinal: "2026-06" })).toBe("calculadora-reforma-tributaria_42_2026-01_2026-06.csv");
     expect(csvFileName({})).toBe("calculadora-reforma-tributaria.csv");
     expect(csvFileName({ empresa: "Loja Centro/SP" })).toBe("calculadora-reforma-tributaria_Loja_Centro_SP.csv");
+  });
+});
+
+describe("printDocumentTitle", () => {
+  it("uses the same stem as the CSV name without the extension", () => {
+    expect(printDocumentTitle({ empresa: "42", periodoInicial: "2026-01", periodoFinal: "2026-06" }))
+      .toBe("calculadora-reforma-tributaria_42_2026-01_2026-06");
+    expect(printDocumentTitle({})).toBe("calculadora-reforma-tributaria");
+  });
+});
+
+describe("printMetaLine", () => {
+  it("joins company, period and rates with a pt-BR decimal mark", () => {
+    expect(printMetaLine({
+      empresa: "42",
+      periodoInicial: "2026-01",
+      periodoFinal: "2026-06",
+      aliquotaIbs: "18.5",
+      aliquotaCbs: "8.5",
+      aliquotaIs: "0",
+    })).toBe("Empresa 42 · 2026-01 – 2026-06 · IBS 18,5% · CBS 8,5% · IS 0%");
+    expect(printMetaLine({ aliquotaIbs: "18.5", aliquotaCbs: "8.5", aliquotaIs: "0" }))
+      .toBe("IBS 18,5% · CBS 8,5% · IS 0%");
+    expect(printMetaLine({})).toBe("");
+  });
+});
+
+describe("printReport", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("calls window.print and restores document.title after printing", () => {
+    const print = vi.fn();
+    vi.stubGlobal("print", print);
+    document.title = "Original";
+
+    printReport("calculadora-reforma-tributaria_42");
+
+    expect(print).toHaveBeenCalledTimes(1);
+    expect(document.title).toBe("calculadora-reforma-tributaria_42");
+    window.dispatchEvent(new Event("afterprint"));
+    expect(document.title).toBe("Original");
+  });
+
+  it("prints without renaming when no title is given", () => {
+    const print = vi.fn();
+    vi.stubGlobal("print", print);
+    document.title = "Original";
+
+    printReport();
+
+    expect(print).toHaveBeenCalledTimes(1);
+    expect(document.title).toBe("Original");
   });
 });

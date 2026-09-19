@@ -188,3 +188,12 @@ export const deriveComparativo = (chart?: ChartJsData): ComparativoRow[] => {
     Reforma: chart.datasets?.[1]?.data?.[i] || 0,
   }));
 };
+
+/**
+ * Highest `valor_total` first, capped at `limit`. Used by the on-screen
+ * ranking and by the print/PDF top-10 tables.
+ */
+export const rankTopProducts = (produtos: Produto[] = [], limit = 10): Produto[] =>
+  [...produtos]
+    .sort((a, b) => (b.valor_total || 0) - (a.valor_total || 0))
+    .slice(0, limit);

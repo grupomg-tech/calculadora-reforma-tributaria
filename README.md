@@ -36,6 +36,7 @@ Constitutional Amendment 132/2023 replaces PIS, COFINS, ICMS, ISS and part of IP
 - **Filters** — company, start and end period; filters can be preset through the URL query string.
 - **Demo mode** — a fictional catalogue of 12 products (basic-basket items at zero rate, reduced-rate goods, products subject to IS) lets you explore the dashboard without a backend.
 - **CSV export** — "Exportar CSV" in the header downloads every purchase and sale product for the loaded report (`;` separator, `,` decimal mark, UTF-8 with BOM).
+- **PDF export** — "Exportar PDF" opens the browser print dialog. A print stylesheet produces a one-page A4 summary (impact cards, both assessment blocks, top-10 tables) and hides filters, charts and other chrome. Save as PDF from the dialog; no extra library.
 - **Auto refresh** — optional 30-second polling.
 
 ## What it does not do
@@ -48,7 +49,7 @@ Constitutional Amendment 132/2023 replaces PIS, COFINS, ICMS, ISS and part of IP
 
 ## Status
 
-Early stage, actively maintained by a single developer. The dashboard is functional; the data mapping, the demo model, the page and the main components are covered by 70 tests (about 92% statement coverage over `src/`, with an 80% threshold enforced in CI). Dependencies are kept current by Dependabot and audited weekly. The UI is Portuguese-only for now. See the [roadmap](#roadmap) and the [open issues](https://github.com/grupomg-tech/calculadora-reforma-tributaria/issues); contributions are welcome — read [CONTRIBUTING.md](CONTRIBUTING.md).
+Early stage, actively maintained by a single developer. The dashboard is functional; the data mapping, the demo model, the page and the main components are covered by 79 tests (about 93% statement coverage over `src/`, with an 80% threshold enforced in CI). Dependencies are kept current by Dependabot and audited weekly. The UI is Portuguese-only for now. See the [roadmap](#roadmap) and the [open issues](https://github.com/grupomg-tech/calculadora-reforma-tributaria/issues); contributions are welcome — read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tech stack
 
@@ -155,7 +156,7 @@ src/
 ├── lib/
 │   ├── api-types.ts                 # API contract
 │   ├── report.ts                    # pure data-mapping functions (+ tests)
-│   ├── export.ts                    # CSV serialisation of the report (+ tests)
+│   ├── export.ts                    # CSV serialisation and print/PDF helper (+ tests)
 │   ├── demo.ts                      # fictional dataset for demo mode (+ tests)
 │   └── config.ts                    # env-based configuration
 ├── pages/Index.tsx                  # data fetching and page layout
@@ -175,7 +176,7 @@ src/
 - [x] Component tests, coverage thresholds, Dependabot, CodeQL and audit workflow
 - [ ] Classification of products (NCM) into the reform's differentiated regimes, with legal references
 - [x] Export the simulation to CSV
-- [ ] Export the simulation to PDF
+- [x] Export the simulation to PDF
 - [ ] English UI (i18n)
 
 ## Documentation
@@ -226,7 +227,7 @@ This is a simulation tool. Results depend entirely on the data and rates supplie
 
 ## Resumo em português
 
-O `calculadora-reforma-tributaria` é um painel (React + TypeScript) que compara a apuração tributária de uma empresa no **sistema atual** com a apuração simulada na **Reforma Tributária** (IBS, CBS e Imposto Seletivo). Permite ajustar as alíquotas, filtrar por empresa e período, ver a variação de débitos, créditos, resultado e carga tributária, analisar os produtos mais comprados e mais vendidos, e exportar a simulação em CSV para planilha.
+O `calculadora-reforma-tributaria` é um painel (React + TypeScript) que compara a apuração tributária de uma empresa no **sistema atual** com a apuração simulada na **Reforma Tributária** (IBS, CBS e Imposto Seletivo). Permite ajustar as alíquotas, filtrar por empresa e período, ver a variação de débitos, créditos, resultado e carga tributária, analisar os produtos mais comprados e mais vendidos, e exportar a simulação em CSV para planilha ou em PDF de uma página (impressão do navegador).
 
 **Demo online:** <https://grupomg-tech.github.io/calculadora-reforma-tributaria/> (dados fictícios; altere as alíquotas e clique em *Simular*).
 
